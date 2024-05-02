@@ -1,4 +1,5 @@
 #include <iostream>
+#include "Barco.h"
 
 using namespace std;
 
