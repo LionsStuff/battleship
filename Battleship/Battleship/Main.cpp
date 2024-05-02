@@ -3,5 +3,5 @@
 using namespace std;
 
 void main() {
-	//
+	enum tipo {FRAGATA, ACORAZADO, DESTRUCTOR};
 };
