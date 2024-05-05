@@ -9,4 +9,9 @@ Barco::Barco(short tipo, short coordsProa[2], short coordsPopa[2]) {
         popa[i] = coordsPopa[i];
     }
 	short vida = csteVida[tipo];
+    short vision = csteVision[tipo];
+    short alcance = csteAlcance[tipo];
+    short nTorpedos = csteNTorpedos[tipo];
+    short aumentoRadar = csteAumentoRadar[tipo];
+    bool activo;
 };
