@@ -3,12 +3,6 @@
 
 using namespace std;
 
-short csteVida[3] = { 2, 3, 5 };
-short csteVision[3] = { 2, 3, 5 };
-short csteAlcance[3] = { 4,7,12 };
-short csteNTorpedos[3] = { 0,0,5 };
-short csteAumentoRadar[3] = { 2,4,8 };
-
 class Barco {
 public:
 	Barco(short, short[2], short[2]);
@@ -22,4 +16,6 @@ public:
 	short nTorpedos; //Numero de torpedos
 	short aumentoRadar; //Cuanto aumenta el radar al activarlo
 	bool activo; //Si el barco esta activo o hundido
+
+	short getVida();
 };
