@@ -5,11 +5,13 @@ using namespace std;
 
 class Barco {
 public:
-	Barco(short, short[2], short[2]);
+	Barco(short);
+	Barco(short, short[2], short[2], short);
 	~Barco();
 	string nombre; //Nombre de barco
 	short proa[2]; //Coordenadas de proa
 	short popa[2]; //Coordenadas de popa
+	short direccion;
 	short vida; //Vida
 	short vision; //Vision superficial
 	short alcance; //Alcance de misil
@@ -18,4 +20,5 @@ public:
 	bool activo; //Si el barco esta activo o hundido
 
 	short getVida();
+	void colocacionBarco();
 };

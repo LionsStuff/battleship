@@ -8,7 +8,7 @@ void main() {
 
 	short testProa[2] = { 0,1 };
 	short testPoa[2] = { 0,2 };
-	Barco barco1 = Barco(ACORAZADO, testProa, testPoa);
+	Barco barco1 = Barco(ACORAZADO);
 
 	cout << "Vida de barco: " << barco1.getVida() << endl;
 };
