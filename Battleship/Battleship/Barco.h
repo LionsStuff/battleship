@@ -11,8 +11,10 @@ public:
 	string nombre; //Nombre de barco
 	short proa[2]; //Coordenadas de proa
 	short popa[2]; //Coordenadas de popa
-	short direccion;
+	short direccion; //Hacia donde ve el barco 
 	short vida; //Vida
+	short coordsBarco[5][2]; //Coordenadas de todo el barco
+	short coordsVida[5][2]; //Coordenadas de toda la vida
 	short vision; //Vision superficial
 	short alcance; //Alcance de misil
 	short nTorpedos; //Numero de torpedos
@@ -21,4 +23,5 @@ public:
 
 	short getVida();
 	void colocacionBarco();
+	void completarCoords();
 };

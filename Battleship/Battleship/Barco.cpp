@@ -6,11 +6,13 @@ short csteAlcance[3] = { 4,7,12 };
 short csteNTorpedos[3] = { 0,0,5 };
 short csteAumentoRadar[3] = { 2,4,8 };
 
+short vectorMovimientoEnX[8] = { 1, 1, 0, -1, -1, -1, 0, 1 };
+short vectorMovimientoEnY[8] = { 0, -1, -1, -1, 0, 1, 1, 1 };
+
 enum class dir { E, NE, N, NO, O, SO, S, SE };
 
 Barco::Barco(short tipo) {
 	nombre = "";
-    colocacionBarco();
     //direccion = getDireccion();
 	vida = csteVida[tipo];
     vision = csteVision[tipo];
@@ -18,6 +20,7 @@ Barco::Barco(short tipo) {
     nTorpedos = csteNTorpedos[tipo];
     aumentoRadar = csteAumentoRadar[tipo];
     activo = true;
+    colocacionBarco();
 };
 
 Barco::Barco(short tipo, short coordsProa[2], short coordsPopa[2], short direccionManual) {
@@ -52,4 +55,13 @@ void Barco::colocacionBarco() {
     cout << "0. Este" << endl << "1. Noreste" << endl << "2. Norte" << endl << "3. Noroeste" << endl;
     cout << "4. Oeste" << endl << "5. Suroeste" << endl << "6. Sur" << endl << "7. Sureste" << endl << ": ";
     cin >> direccion;
+    cout << "Popa colocada en: " << popa[0] << "," << popa[1] << endl;
+    completarCoords();
+}
+
+void Barco::completarCoords() {
+    for (short i = 0; i < vision; i++) {
+        coordsBarco[i][0] = popa[0] + (vectorMovimientoEnX[direccion] * i);
+        coordsBarco[i][1] = popa[1] + (vectorMovimientoEnY[direccion] * i);
+    }
 }
