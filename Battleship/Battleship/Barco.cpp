@@ -14,18 +14,21 @@ enum class dir { E, NE, N, NO, O, SO, S, SE };
 Barco::Barco(short tipo) {
 	nombre = "";
     //direccion = getDireccion();
+    for (short i = 0; i < 2; ++i) {
+        proa[i] = 0;
+        popa[i] = 0;
+    }
 	vida = csteVida[tipo];
     vision = csteVision[tipo];
     alcance = csteAlcance[tipo];
     nTorpedos = csteNTorpedos[tipo];
     aumentoRadar = csteAumentoRadar[tipo];
     activo = true;
-    colocacionBarco();
 };
 
 Barco::Barco(short tipo, short coordsProa[2], short coordsPopa[2], short direccionManual) {
     nombre = "";
-    for (int i = 0; i < 2; ++i) {
+    for (short i = 0; i < 2; ++i) {
         proa[i] = coordsProa[i];
         popa[i] = coordsPopa[i];
     }
@@ -46,7 +49,7 @@ short Barco::getVida() {
 
 //static_cast<int>(dir::E)
 
-void Barco::colocacionBarco() {
+void Barco::colocacionBarco(char** mapa) {
     cout << "Ingrese las coordenadas de la popa. " << endl << "X: ";
     cin >> popa[0];
     cout << "Y: ";
@@ -57,6 +60,9 @@ void Barco::colocacionBarco() {
     cin >> direccion;
     cout << "Popa colocada en: " << popa[0] << "," << popa[1] << endl;
     completarCoords();
+    for (short i = 0; i < vision; i++) {
+        mapa[(coordsBarco[i][0] - 1)][(coordsBarco[i][1] - 1)] = 254;
+    }
 }
 
 void Barco::completarCoords() {

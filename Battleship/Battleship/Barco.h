@@ -22,6 +22,6 @@ public:
 	bool activo; //Si el barco esta activo o hundido
 
 	short getVida();
-	void colocacionBarco();
+	void colocacionBarco(char**);
 	void completarCoords();
 };

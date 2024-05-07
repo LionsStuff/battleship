@@ -10,7 +10,7 @@ char** mapa;
 
 void limpiarMapa(char**);
 void imprimirMapa(char**);
-void actualizarMapa(char**, Barco, bool = false);
+void actualizarMapa(char**, Barco);
 
 void main() {
 	mapa = new char*[MAX_MAPA_XCOL];
@@ -27,7 +27,9 @@ void main() {
 	system("cls");
 	while (true) {
 		char foo = 'y';
-		actualizarMapa(mapa, barco1, true);
+		imprimirMapa(mapa);
+		barco1.colocacionBarco(mapa);
+		system("cls");
 		imprimirMapa(mapa);
 		cout << endl;
 		cout << "POSICION FINAL DEL BARCO?: ";
@@ -35,10 +37,9 @@ void main() {
 		if (foo != 'n') {
 			break;
 		}
-		limpiarMapa(mapa);
-		system("cls");
-		imprimirMapa(mapa);
-		barco1.colocacionBarco();
+		for (short i = 0; i < barco1.vision; i++) {
+			mapa[(barco1.coordsBarco[i][0] - 1)][(barco1.coordsBarco[i][1] - 1)] = '~';
+		}
 		system("cls");
 	}
 	system("cls");
@@ -80,7 +81,7 @@ void imprimirMapa(char** mapa) {
 	}
 }
 
-void actualizarMapa(char** mapa, Barco barco, bool preview) {
+void actualizarMapa(char** mapa, Barco barco) {
 	char foo = 'F';
 	switch (barco.vision) {
 	case 2:
@@ -94,11 +95,6 @@ void actualizarMapa(char** mapa, Barco barco, bool preview) {
 		break;
 	}
 	for (short i = 0; i < barco.vision; i++) {
-		if (!preview) {
-			mapa[(barco.coordsBarco[i][0] - 1)][(barco.coordsBarco[i][1] - 1)] = foo;
-		}
-		else {
-			mapa[(barco.coordsBarco[i][0] - 1)][(barco.coordsBarco[i][1] - 1)] = 254;
-		}
+		mapa[(barco.coordsBarco[i][0] - 1)][(barco.coordsBarco[i][1] - 1)] = foo;
 	}
 }
