@@ -21,7 +21,6 @@ public:
 	short aumentoRadar; //Cuanto aumenta el radar al activarlo
 	bool activo; //Si el barco esta activo o hundido
 
-	short getVida();
 	void colocacionBarco(char**);
 	void completarCoords();
 };

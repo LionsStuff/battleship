@@ -43,12 +43,10 @@ Barco::Barco(short tipo, short coordsProa[2], short coordsPopa[2], short direcci
 
 Barco::~Barco() {};
 
-short Barco::getVida() {
-    return vida;
-};
-
 //static_cast<int>(dir::E)
 
+//Solo pregunta por coordenadas de popa y la direccion para hacer una colocaciion rapida
+//Falta validacion
 void Barco::colocacionBarco(char** mapa) {
     cout << "Ingrese las coordenadas de la popa. " << endl << "X: ";
     cin >> popa[0];
@@ -61,10 +59,12 @@ void Barco::colocacionBarco(char** mapa) {
     cout << "Popa colocada en: " << popa[0] << "," << popa[1] << endl;
     completarCoords();
     for (short i = 0; i < vision; i++) {
+        //Antes de confirmar, coloca un simbolo momentario
         mapa[(coordsBarco[i][0] - 1)][(coordsBarco[i][1] - 1)] = 254;
     }
 }
 
+//Completa las coordenadas de cada "pedazo" del barco
 void Barco::completarCoords() {
     for (short i = 0; i < vision; i++) {
         coordsBarco[i][0] = popa[0] + (vectorMovimientoEnX[direccion] * i);
