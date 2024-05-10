@@ -5,10 +5,12 @@ using namespace std;
 
 class Barco {
 public:
+	Barco();
 	Barco(short);
 	Barco(short, short[2], short[2], short);
 	~Barco();
 	string nombre; //Nombre de barco
+	short tipo; //Tipo de barco 0,1,2
 	short proa[2]; //Coordenadas de proa
 	short popa[2]; //Coordenadas de popa
 	short direccion; //Hacia donde ve el barco 

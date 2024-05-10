@@ -11,8 +11,13 @@ short vectorMovimientoEnY[8] = { 0, -1, -1, -1, 0, 1, 1, 1 };
 
 enum class dir { E, NE, N, NO, O, SO, S, SE };
 
+Barco::Barco() {
+
+}
+
 Barco::Barco(short tipo) {
 	nombre = "";
+    this->tipo = tipo;
     //direccion = getDireccion();
     for (short i = 0; i < 2; ++i) {
         proa[i] = 0;
@@ -28,6 +33,7 @@ Barco::Barco(short tipo) {
 
 Barco::Barco(short tipo, short coordsProa[2], short coordsPopa[2], short direccionManual) {
     nombre = "";
+    this->tipo = tipo;
     for (short i = 0; i < 2; ++i) {
         proa[i] = coordsProa[i];
         popa[i] = coordsPopa[i];

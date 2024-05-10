@@ -1,3 +1,3 @@
-﻿  Barco.cpp
-C:\Users\leona\ODpatch\OneDrive\Documents\GitHub\battleship\Battleship\Battleship\Barco.cpp(64,66): warning C4309: '=': truncation of constant value
+﻿  Main.cpp
+C:\Users\leona\ODpatch\OneDrive\Documents\GitHub\battleship\Battleship\Battleship\Main.cpp(21,13): warning C4326: return type of 'main' should be 'int' instead of 'void'
   Battleship.vcxproj -> C:\Users\leona\ODpatch\OneDrive\Documents\GitHub\battleship\Battleship\x64\Debug\Battleship.exe
