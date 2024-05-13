@@ -1,3 +1,2 @@
-﻿  Main.cpp
-C:\Users\leona\ODpatch\OneDrive\Documents\GitHub\battleship\Battleship\Battleship\Main.cpp(21,13): warning C4326: return type of 'main' should be 'int' instead of 'void'
+﻿  Barco.cpp
   Battleship.vcxproj -> C:\Users\leona\ODpatch\OneDrive\Documents\GitHub\battleship\Battleship\x64\Debug\Battleship.exe

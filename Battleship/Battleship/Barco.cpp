@@ -53,20 +53,18 @@ Barco::~Barco() {};
 
 //Solo pregunta por coordenadas de popa y la direccion para hacer una colocaciion rapida
 //Falta validacion
-void Barco::colocacionBarco(char** mapa) {
-    cout << "Ingrese las coordenadas de la popa. " << endl << "X: ";
-    cin >> popa[0];
-    cout << "Y: ";
-    cin >> popa[1];
+void Barco::colocacionBarco(char** mapa, short popaX, short popaY) {
+    popa[0] = popaX;
+    popa[1] = popaY;
     cout << "Ingrese la direccion del barco (popa a proa). " << endl;
-    cout << "0. Este" << endl << "1. Noreste" << endl << "2. Norte" << endl << "3. Noroeste" << endl;
-    cout << "4. Oeste" << endl << "5. Suroeste" << endl << "6. Sur" << endl << "7. Sureste" << endl << ": ";
+    cout << "3. Noroeste  " << "2.  Norte    " << "1. Noreste    " << endl;
+    cout << "4.   Oeste   " << "      ?      " << "0.   Este     " << endl;
+    cout << "5. Suroeste  " << "6.   Sur     " << "7. Sureste    " << endl << ": ";
     cin >> direccion;
-    cout << "Popa colocada en: " << popa[0] << "," << popa[1] << endl;
     completarCoords();
     for (short i = 0; i < vision; i++) {
         //Antes de confirmar, coloca un simbolo momentario
-        mapa[(coordsBarco[i][0] - 1)][(coordsBarco[i][1] - 1)] = 254;
+        mapa[(coordsBarco[i][0] - 1)][(coordsBarco[i][1] - 1)] = '?';
     }
 }
 
@@ -75,5 +73,16 @@ void Barco::completarCoords() {
     for (short i = 0; i < vision; i++) {
         coordsBarco[i][0] = popa[0] + (vectorMovimientoEnX[direccion] * i);
         coordsBarco[i][1] = popa[1] + (vectorMovimientoEnY[direccion] * i);
+    }
+}
+
+//Mover barco a Proa o Popa
+void Barco::moverBarco(bool aProa) {
+    try {
+        popa[0] + vectorMovimientoEnX[direccion];
+        popa[1] + vectorMovimientoEnY[direccion];
+    }
+    catch (...) {
+
     }
 }

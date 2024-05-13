@@ -1,4 +1,5 @@
 #include <iostream>
+#include <locale.h>
 #include <vector>
 #include "Barco.h"
 
@@ -17,11 +18,16 @@ char** mapa;
 void limpiarMapa(char**);
 void imprimirMapa(char**);
 void actualizarMapa(char**, vector<Barco>&);
+Barco colocacionBarcos(short*);
+
+enum tipo { FRAGATA, ACORAZADO, DESTRUCTOR };
 
 void main() {
+	setlocale(LC_ALL, "");
+
 	//Enum de los tipos de barco y crear un vector de barcos
-	enum tipo { FRAGATA, ACORAZADO, DESTRUCTOR };
 	vector<Barco> barcos;
+	short nBarcos[nFragata + nAcorazado + nDestructor] = { nFragata, nAcorazado, nDestructor };
 
 	//Inicializacion del mapa
 	mapa = new char*[MAX_MAPA_XCOL];
@@ -29,56 +35,24 @@ void main() {
 		mapa[i] = new char [MAX_MAPA_YROW];
 	}
 	limpiarMapa(mapa);
-
-	//Eleccion de tipo de barco
-	char foo = 'y';
-	short bar = FRAGATA;
-	imprimirMapa(mapa);
-	cout << "Barcos restantes por colocar:";
-	cout << "Fragata: " << nFragata << " | "
-		<< "Acorazado: " << nAcorazado << " | "
-		<< "Destructor: " << nDestructor << endl;
-	cout << "Que barco va a colocar? (F/A/D): ";
-	cin >> foo;
-	switch (foo) {
-	case 'F':
-		//Los barcos se colocan automaticamente en 0,0 al incio
-		bar = FRAGATA;
-		break;
-	case 'A':
-		//Los barcos se colocan automaticamente en 0,0 al incio
-		bar = ACORAZADO;
-		break;
-	case 'D':
-		//Los barcos se colocan automaticamente en 0,0 al incio
-		bar = DESTRUCTOR;
-		break;
-	}
-	Barco barco1 = Barco(bar);
-
-	//Colocacion de barco - Por pasarlo a una funcion
 	system("cls");
+
+	short temporalCounter = 0;
+	
 	while (true) {
-		barco1.colocacionBarco(mapa);
-		system("cls");
+		if ((nBarcos[0] + nBarcos[1] + nBarcos[2]) <= 0) {
+			break;
+		}
 		imprimirMapa(mapa);
-		cout << endl;
-		cout << "POSICION FINAL DEL BARCO?: ";
-		cin >> foo;
-		if (foo != 'n') {
-			break; //Solo si el usuario presiona n, va a volver a pedir la informacion
-		}
-		for (short i = 0; i < barco1.vision; i++) {
-			//Mapa[x][y]
-			//barco1.coords[indice de un bloque del barco][0 para x y 1 para y] - 1
-			//-1 ya que las coords son una cosa y el indice es otro. El mapa trabaja en indices.
-			mapa[(barco1.coordsBarco[i][0] - 1)][(barco1.coordsBarco[i][1] - 1)] = '~';
-		}
+		cout << "Barcos restantes por colocar: ";
+		cout << "Fragata: " << nBarcos[0] << " | "
+			<< "Acorazado: " << nBarcos[1] << " | "
+			<< "Destructor: " << nBarcos[2] << endl;
+		barcos.push_back(colocacionBarcos(nBarcos));
+		actualizarMapa(mapa, barcos);
+		temporalCounter++;
 		system("cls");
 	}
-	system("cls");
-	barcos.push_back(barco1);
-	actualizarMapa(mapa, barcos);
 	imprimirMapa(mapa);
 };
 
@@ -121,29 +95,88 @@ void imprimirMapa(char** mapa) {
 	}
 }
 
-/*
-void actualizarMapa(char** mapa, Barco barco) {
-	char foo = 'F';
-	switch (barco.tipo) {
-	case 0:
-		foo = 'F';
-		break;
-	case 1:
-		foo = 'A';
-		break;
-	case 2:
-		foo = 'D';
-		break;
+Barco colocacionBarcos(short* nBarcos) {
+	//Eleccion de tipo de barco
+	char foo = 'y';
+	short bar = FRAGATA;
+	bool barcoValido = false;
+
+	while (!barcoValido) {
+		cout << "¿Qué barco va a colocar? (F/A/D): ";
+		cin >> foo;
+		switch (foo) {
+		case 'F':
+			if (nBarcos[0] <= 0) {
+				cout << endl << "Ya no puedes colocar más fragatas. " << endl;
+				break;
+			}
+			bar = FRAGATA;
+			nBarcos[0]--;
+			barcoValido = true;
+			break;
+		case 'A':
+			if (nBarcos[1] <= 0) {
+				cout << endl << "Ya no puedes colocar más acorazados. " << endl;
+				break;
+			}
+			bar = ACORAZADO;
+			nBarcos[1]--;
+			barcoValido = true;
+			break;
+		case 'D':
+			if (nBarcos[2] <= 0) {
+				cout << endl << "Ya no puedes colocar más destructores. " << endl;
+				break;
+			}
+			bar = DESTRUCTOR;
+			nBarcos[2]--;
+			barcoValido = true;
+			break;
+		default:
+			cout << endl << "Tipo de barco no existente." << endl;
+		}
+
 	}
-	for (short i = 0; i < barco.vision; i++) {
-		mapa[(barco.coordsBarco[i][0] - 1)][(barco.coordsBarco[i][1] - 1)] = foo;
+
+	Barco barco1 = Barco(bar);
+	short popaX, popaY;
+
+	//Colocacion de barco - Por pasarlo a una funcion
+	system("cls");
+	while (true) {
+		imprimirMapa(mapa);
+		cout << "Ingrese las coordenadas de la popa. " << endl << "X: ";
+		cin >> popaX;
+		cout << "Y: ";
+		cin >> popaY;
+		mapa[(popaX - 1)][(popaY - 1)] = '?';
+		system("cls");
+		imprimirMapa(mapa);
+		barco1.colocacionBarco(mapa,popaX,popaY);
+		system("cls");
+		imprimirMapa(mapa);
+		cout << endl;
+		cout << "¿POSICIÓN FINAL DEL BARCO?: ";
+		cin >> foo;
+		if (foo != 'n') {
+			break; //Solo si el usuario presiona n, va a volver a pedir la informacion
+		}
+		for (short i = 0; i < barco1.vision; i++) {
+			//Mapa[x][y]
+			//barco1.coords[indice de un bloque del barco][0 para x y 1 para y] - 1
+			//-1 ya que las coords son una cosa y el indice es otro. El mapa trabaja en indices.
+			mapa[(barco1.coordsBarco[i][0] - 1)][(barco1.coordsBarco[i][1] - 1)] = '~';
+		}
+		system("cls");
 	}
-}*/
+
+	return barco1;
+}
 
 //Guarda en el simbolo que representa a los barcos en el mapa
 void actualizarMapa(char** mapa, vector<Barco>& barcos) {
 	char foo = 'F';
-	cout << "Size: " << barcos.size() << endl;
+	//cout << "Size: " << barcos.size() << endl;
 	for (short i = 0; i < barcos.size(); i++) {
 		switch (barcos[i].tipo) {
 		case 0:
