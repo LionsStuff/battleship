@@ -77,12 +77,13 @@ void Barco::completarCoords() {
 }
 
 //Mover barco a Proa o Popa
-void Barco::moverBarco(bool aProa) {
-    try {
-        popa[0] + vectorMovimientoEnX[direccion];
-        popa[1] + vectorMovimientoEnY[direccion];
+void Barco::moverBarco(short maxX, short maxY, bool aProa) {
+    if (((popa[0] + vectorMovimientoEnX[direccion]) <= maxX) && ((popa[1] + vectorMovimientoEnY[direccion]) <= maxY)) {
+        popa[0] += vectorMovimientoEnX[direccion];
+        popa[1] += vectorMovimientoEnY[direccion];
     }
-    catch (...) {
-
+    else {
+        cout << "Fuera de mapa." << endl;
     }
 }
+

@@ -9,8 +9,8 @@ using namespace std;
 #define MAX_MAPA_XCOL 30
 #define MAX_MAPA_YROW 20
 
-#define nFragata 2
-#define nAcorazado 2
+#define nFragata 1
+#define nAcorazado 1
 #define nDestructor 1
 
 char** mapa;
@@ -40,7 +40,10 @@ void main() {
 	short temporalCounter = 0;
 	
 	while (true) {
-		if ((nBarcos[0] + nBarcos[1] + nBarcos[2]) <= 0) {
+		/*if ((nBarcos[0] + nBarcos[1] + nBarcos[2]) <= 0) {
+			break;
+		}*/
+		if (nBarcos[2] <= 0) {
 			break;
 		}
 		imprimirMapa(mapa);
@@ -54,6 +57,11 @@ void main() {
 		system("cls");
 	}
 	imprimirMapa(mapa);
+	barcos[1].moverBarco(MAX_MAPA_XCOL, MAX_MAPA_YROW, true);
+	barcos[1].completarCoords();
+	actualizarMapa(mapa, barcos);
+	imprimirMapa(mapa);
+
 };
 
 //Limpia todo el mapa, rellena todo de "agua"
@@ -175,6 +183,7 @@ Barco colocacionBarcos(short* nBarcos) {
 
 //Guarda en el simbolo que representa a los barcos en el mapa
 void actualizarMapa(char** mapa, vector<Barco>& barcos) {
+	limpiarMapa(mapa);
 	char foo = 'F';
 	//cout << "Size: " << barcos.size() << endl;
 	for (short i = 0; i < barcos.size(); i++) {
