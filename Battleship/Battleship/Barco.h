@@ -24,6 +24,8 @@ public:
 	bool activo; //Si el barco esta activo o hundido
 
 	void colocacionBarco(char**, short, short);
-	void moverBarco(short, short, bool aProa);
-	void completarCoords();
+	bool moverBarco(bool);
+	bool rotarBarco(bool);
+	bool barcoEnPosicionValida(short modif = 0, short modifDireccion = 0);
+	void completarCoords(short modifDireccion = 0);
 };

@@ -57,12 +57,49 @@ void main() {
 		system("cls");
 	}
 	imprimirMapa(mapa);
-	barcos[1].moverBarco(MAX_MAPA_XCOL, MAX_MAPA_YROW, true);
-	barcos[1].completarCoords();
+	short inputBabor;
+	cout << "Mover" << endl << "1. A Proa (adelante)" << endl << "2. A Popa (atras)" << endl;
+	cin >> inputBabor;
+	system("cls");
+	switch (inputBabor) {
+	case 1:
+		if (!barcos[1].moverBarco(true)) {
+			cout << "Movimiento ilegal." << endl;
+		}
+		break;
+	case 2:
+		if (!barcos[1].moverBarco(false)) {
+			cout << "Movimiento ilegal." << endl;
+		}
+		break;
+	}
+	actualizarMapa(mapa, barcos);
+	imprimirMapa(mapa);
+
+	cout << "Rotar" << endl << "1. A Babor (Contra manecillas)" << endl << "2. A Estribor (Manecillas)" << endl;
+	cin >> inputBabor;
+	system("cls");
+	switch (inputBabor) {
+	case 1:
+		if (!barcos[1].rotarBarco(true)) {
+			cout << "Movimiento ilegal." << endl;
+		}
+		break;
+	case 2:
+		if (!barcos[1].rotarBarco(false)) {
+			cout << "Movimiento ilegal." << endl;
+		}
+		break;
+	}
 	actualizarMapa(mapa, barcos);
 	imprimirMapa(mapa);
 
 };
+
+
+
+
+
 
 //Limpia todo el mapa, rellena todo de "agua"
 void limpiarMapa(char ** mapa) {
@@ -151,12 +188,21 @@ Barco colocacionBarcos(short* nBarcos) {
 
 	//Colocacion de barco - Por pasarlo a una funcion
 	system("cls");
-	while (true) {
+	do {
 		imprimirMapa(mapa);
-		cout << "Ingrese las coordenadas de la popa. " << endl << "X: ";
-		cin >> popaX;
-		cout << "Y: ";
-		cin >> popaY;
+		do {
+			cout << "Ingrese las coordenadas de la popa. " << endl << "X: ";
+			cin >> popaX;
+			cout << "Y: ";
+			cin >> popaY;
+			//Validar mayor a tamaño de mapa o en negativas
+			if ((popaX > MAX_MAPA_XCOL) || (popaY > MAX_MAPA_YROW) || (popaX < 1) || (popaY < 1)) {
+				cout << "Posicion de coordenadas invalida" << endl;
+			}
+			else {
+				break;
+			}
+		} while (true);
 		mapa[(popaX - 1)][(popaY - 1)] = '?';
 		system("cls");
 		imprimirMapa(mapa);
@@ -176,7 +222,7 @@ Barco colocacionBarcos(short* nBarcos) {
 			mapa[(barco1.coordsBarco[i][0] - 1)][(barco1.coordsBarco[i][1] - 1)] = '~';
 		}
 		system("cls");
-	}
+	}while (true);
 
 	return barco1;
 }
