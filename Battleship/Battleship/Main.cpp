@@ -46,7 +46,7 @@ void main() {
 
 	lecturaBarcos(barcos);
 	actualizarMapa(mapa, barcos);
-	cout << "Barco cargados." << endl;
+	cout << "Barcos cargados." << endl;
 	char temp;
 	cin >> temp;
 
@@ -223,52 +223,39 @@ void imprimirInfoBarcos(vector<Barco>& barcos) {
 
 Barco colocacionBarcos(short* nBarcos, vector<Barco>& barcos) {
 	//Eleccion de tipo de barco
+	short nMaxes[3] = { nFragata, nAcorazado, nDestructor };
 	char foo = 'y';
-	short bar = FRAGATA;
+	char charTipo = 'N';
+	short intTipo = -1;
+	short bar = -1;
 	bool barcoValido = false;
 	string nombre = "";
 
 	while (!barcoValido) {
 		cout << "¿Qué barco va a colocar? (F/A/D): ";
-		cin >> foo;
-		switch (foo) {
-		case 'F':
-			if (nBarcos[0] <= 0) {
-				cout << endl << "Ya no puedes colocar más fragatas. " << endl;
-				break;
-			}
-			nombre = "alF" + to_string(nFragata - nBarcos[0] + 1);
-			bar = FRAGATA;
-			nBarcos[0]--;
-			barcoValido = true;
-			break;
-		case 'A':
-			if (nBarcos[1] <= 0) {
-				cout << endl << "Ya no puedes colocar más acorazados. " << endl;
-				break;
-			}
-			nombre = "alA" + to_string(nAcorazado - nBarcos[1] + 1);
-			bar = ACORAZADO;
-			nBarcos[1]--;
-			barcoValido = true;
-			break;
-		case 'D':
-			if (nBarcos[2] <= 0) {
-				cout << endl << "Ya no puedes colocar más destructores. " << endl;
-				break;
-			}
-			nombre = "alD" + to_string(nDestructor - nBarcos[2] + 1);
-			bar = DESTRUCTOR;
-			nBarcos[2]--;
-			barcoValido = true;
-			break;
-		default:
-			cout << endl << "Tipo de barco no existente." << endl;
-		}
+		cin >> charTipo;
+		cin.ignore();
 
+		//Va a asignar el valor de tipo de barco correspondiente
+		//En caso de que no sea nignuno, asigna un valor de -1
+		intTipo = (charTipo == 'F') ? FRAGATA : (charTipo == 'A') ? ACORAZADO : (charTipo == 'D') ? DESTRUCTOR : -1;
+
+		//Primero detecta si un valor de -1 y en ese caso, la colocacion de barco es invalida
+		//En caso de que no sea -1, checa luego si el numero de barcos permitido es menor a 0
+		//En caso de que lo sea, la colocacion tambien es invalida. En caso de que sea mayor, procede la colocacion.
+		barcoValido = (intTipo == -1) ? false : (nBarcos[intTipo] <= 0) ? false : true; //Falta mensaje de falla
+
+		//Mensaje de error de colocacion de barco
+		if (!barcoValido) { cout << "Colocacion de barco inválida. " << endl; continue; }
+
+		//Reduce el numero de barcos del tipo disponibles y genera un nombre segun la sintaxis
+		nombre = "al";
+		nombre += charTipo;
+		nombre += to_string(nMaxes[intTipo] - nBarcos[intTipo] + 1);
+		nBarcos[intTipo]--;
 	}
 
-	Barco barco1 = Barco(bar);
+	Barco barco1 = Barco(intTipo);
 	barco1.nombre = nombre;
 	short popaX, popaY;
 
@@ -277,6 +264,7 @@ Barco colocacionBarcos(short* nBarcos, vector<Barco>& barcos) {
 	do {
 		imprimirMapa(mapa);
 		do {
+			cout << "Colocando a: " << barco1.nombre << endl;
 			cout << "Ingrese las coordenadas de la popa. " << endl << "X: ";
 			cin >> popaX;
 			cout << "Y: ";

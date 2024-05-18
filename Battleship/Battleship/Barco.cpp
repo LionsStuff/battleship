@@ -43,13 +43,13 @@ Barco::Barco(short tipo, short coordsPopa[2], short coordsProa[2]) {
     }
     direccion = -1;
     getDireccion();
-    completarCoords();
     vida = csteVida[tipo];
     vision = csteVision[tipo];
     alcance = csteAlcance[tipo];
     nTorpedos = csteNTorpedos[tipo];
     aumentoRadar = csteAumentoRadar[tipo];
     activo = true; //Falta checar que si vida es 0, quitar activo
+    completarCoords();
 };
 
 Barco::~Barco() {};
@@ -169,7 +169,7 @@ bool Barco::barcoEnPosicionValida(char** mapa, vector<Barco>& barcos, short modi
     short vX = vectorMovimientoEnX[direccion];
     short vY = vectorMovimientoEnY[direccion];
 
-    /*
+    
     for (short i = 0; i < vision; i++) {
         if ((coordsBarco[i][0] > MAX_MAPA_XCOL) || (coordsBarco[i][1] > MAX_MAPA_YROW)) {
             cout << "El barco se sale del mapa." << endl;
@@ -179,7 +179,7 @@ bool Barco::barcoEnPosicionValida(char** mapa, vector<Barco>& barcos, short modi
             cout << "El barco se sale del mapa." << endl;
             return false;
         }
-        
+    /*
         if (mapa[(coordsBarco[i][0] - 1)][(coordsBarco[i][1] - 1)] != '~') {
             for (short b = 0; b < barcos.size(); b++) {
                 if (barcos[b].nombre != nombre) {
@@ -192,9 +192,9 @@ bool Barco::barcoEnPosicionValida(char** mapa, vector<Barco>& barcos, short modi
                 }
             }
         }
-    }
     */
-
+    }
+    
     return true;
 }
 
