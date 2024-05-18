@@ -1,3 +1,4 @@
-﻿  Barco.cpp
-C:\Users\leona\ODpatch\OneDrive\Documents\GitHub\battleship\Battleship\Battleship\Barco.cpp(123,11): warning C4101: 'modif': unreferenced local variable
+﻿  Main.cpp
+C:\Users\leona\ODpatch\OneDrive\Documents\GitHub\battleship\Battleship\Battleship\Main.cpp(31,13): warning C4326: return type of 'main' should be 'int' instead of 'void'
+C:\Users\leona\ODpatch\OneDrive\Documents\GitHub\battleship\Battleship\Battleship\Main.cpp(311,16): warning C4267: 'initializing': conversion from 'size_t' to 'short', possible loss of data
   Battleship.vcxproj -> C:\Users\leona\ODpatch\OneDrive\Documents\GitHub\battleship\Battleship\x64\Debug\Battleship.exe

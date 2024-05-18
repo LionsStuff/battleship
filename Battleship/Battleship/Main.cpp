@@ -22,7 +22,7 @@ char** mapa;
 void limpiarMapa(char**);
 void imprimirMapa(char**);
 void actualizarMapa(char**, vector<Barco>&);
-Barco colocacionBarcos(short*, vector<Barco>&);
+Barco colocarNuevoBarco(short*, vector<Barco>&);
 void imprimirInfoBarcos(vector<Barco>&);
 void lecturaBarcos(vector<Barco>&);
 
@@ -62,14 +62,14 @@ void main() {
 		cout << "Fragata: " << nBarcos[0] << " | "
 			<< "Acorazado: " << nBarcos[1] << " | "
 			<< "Destructor: " << nBarcos[2] << endl;
-		barcos.push_back(colocacionBarcos(nBarcos, barcos));
+		barcos.push_back(colocarNuevoBarco(nBarcos, barcos));
 		actualizarMapa(mapa, barcos);
 		temporalCounter++;
 		system("cls");
 	}
 
 
-	short inputBabor, inputOpcion;
+	short direccionMovimiento, inputOpcion;
 	bool inLoop = true;
 	string nombreBarco;
 
@@ -82,45 +82,31 @@ void main() {
 		cin.ignore();
 		cout << "Ingrese el nombre del barco: " << endl;
 		getline(cin, nombreBarco);
+
+		//Busca el nombre de barco e ingresa al menu si existe
 		for (short i = 0; i < barcos.size(); i++) {
 			if (barcos[i].nombre == nombreBarco) {
+
+				//Menu de opciones
 				switch (inputOpcion) {
-				case 1:
-					cout << "Mover" << endl << "1. A Proa (adelante)" << endl << "2. A Popa (atras)" << endl;
-					cin >> inputBabor;
+				case 1: //Mover
+					cout << "Mover" << endl << "1. A Proa (adelante)" << endl << "2. A Popa (atrás)" << endl;
+					cin >> direccionMovimiento;
+					direccionMovimiento--; //Reutilizar la variable como boolean (0 y 1 tambien funciona como false y true)
 					system("cls");
-					switch (inputBabor) {
-					case 1:
-						if (!barcos[i].moverBarco(mapa, true, barcos)) {
-							cout << "Movimiento ilegal." << endl;
-						}
-						break;
-					case 2:
-						if (!barcos[i].moverBarco(mapa, false, barcos)) {
-							cout << "Movimiento ilegal." << endl;
-						}
-						break;
+					if (!barcos[i].moverBarco(mapa, !direccionMovimiento, barcos)) {
+						cout << "Movimiento ilegal." << endl;
 					}
 					actualizarMapa(mapa, barcos);
 					break;
-				case 2:
-					cout << "Rotar" << endl << "1. A Babor (Contra manecillas)" << endl << "2. A Estribor (Manecillas)" << endl;
-					cin >> inputBabor;
+				case 2: //Rotar
+					cout << "Rotar" << endl << "1. A Babor (Contra-Manecillas)" << endl << "2. A Estribor (Manecillas)" << endl;
+					cin >> direccionMovimiento;
+					direccionMovimiento--;
 					system("cls");
-					switch (inputBabor) {
-					case 1:
-						if (!barcos[i].rotarBarco(mapa, true, barcos)) {
-							cout << "Movimiento ilegal." << endl;
-						}
-						break;
-					case 2:
-						if (!barcos[i].rotarBarco(mapa, false, barcos)) {
-							cout << "Movimiento ilegal." << endl;
-						}
-						break;
+					if (!barcos[i].rotarBarco(mapa, !direccionMovimiento, barcos)) {
+						cout << "Movimiento ilegal." << endl;
 					}
-					actualizarMapa(mapa, barcos);
-					break;
 				default:
 					inLoop = false;
 					break;
@@ -178,27 +164,15 @@ void imprimirMapa(char** mapa) {
 
 //Guarda en el simbolo que representa a los barcos en el mapa
 void actualizarMapa(char** mapa, vector<Barco>& barcos) {
+	char barcoChars[] = { 'F','A','D' };
 	limpiarMapa(mapa);
 	char chars[5] = "";
-	//cout << "Size: " << barcos.size() << endl;
+	
 	for (short i = 0; i < barcos.size(); i++) {
-		switch (barcos[i].tipo) {
-		case 0:
-			for (short j = 0; j < (barcos[i].vision - 1); j++) {
-				chars[j] = 'F';
-			}
-			break;
-		case 1:
-			for (short j = 0; j < (barcos[i].vision - 1); j++) {
-				chars[j] = 'A';
-			}
-			break;
-		case 2:
-			for (short j = 0; j < (barcos[i].vision - 1); j++) {
-				chars[j] = 'D';
-			}
-			break;
+		for (short j = 0; j < (barcos[i].vision - 1); j++) {
+			chars[j] = barcoChars[barcos[i].tipo];
 		}
+
 		chars[barcos[i].vision - 1] = '+';
 		for (short j = 0; j < barcos[i].vision; j++) {
 			//cout << barcos[i].coordsBarco[j][0] << "," << barcos[i].coordsBarco[j][1] - 1 << endl;
@@ -208,26 +182,25 @@ void actualizarMapa(char** mapa, vector<Barco>& barcos) {
 }
 
 void imprimirInfoBarcos(vector<Barco>& barcos) {
-	cout << "---- Barcos restantes ----" << endl;
+	cout << "---- Nuestros Barcos Restantes ----" << endl;
 	for (short i = 0; i < barcos.size(); i++) {
 		//Checa si el barco no esta hundido y si es nuestro ("ya que los nuestros inician con 'al')
-		if (barcos[i].activo && (barcos[i].nombre[0] == 'a')) {
-			cout << barcos[i].nombre << "     Popa(" << barcos[i].popa[0] << "," << barcos[i].popa[1] << ")" << "     Proa(" << barcos[i].proa[0] << "," << barcos[i].proa[1] << ")" << "        Direccion: " << barcos[i].direccion << endl;
+		if (barcos[i].activo && (barcos[i].nombre[0] == 'a') && (barcos[i].nombre[1] == 'l')) {
+			cout << barcos[i].nombre << "     Popa(" << barcos[i].popa[0] << "," << barcos[i].popa[1] << ")" << "     Proa(" << barcos[i].proa[0] << "," << barcos[i].proa[1] << ")" << endl;
 		}
 	}
-	cout << "--------------------------" << endl;
+	cout << "-----------------------------------" << endl;
 }
 
 
 // ~~~~ FUNCIONES DE JUEGO ~~~~
 
-Barco colocacionBarcos(short* nBarcos, vector<Barco>& barcos) {
+Barco colocarNuevoBarco(short* nBarcos, vector<Barco>& barcos) {
 	//Eleccion de tipo de barco
 	short nMaxes[3] = { nFragata, nAcorazado, nDestructor };
 	char foo = 'y';
 	char charTipo = 'N';
 	short intTipo = -1;
-	short bar = -1;
 	bool barcoValido = false;
 	string nombre = "";
 
