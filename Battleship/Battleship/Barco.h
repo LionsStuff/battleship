@@ -17,7 +17,7 @@ public:
 	short direccion; //Hacia donde ve el barco 
 	short vida; //Vida
 	short coordsBarco[5][2]; //Coordenadas de todo el barco
-	short coordsVida[5][2]; //Coordenadas de toda la vida
+	short coordsVida[5]; //Coordenadas de toda la vida
 	short vision; //Vision superficial
 	short alcance; //Alcance de misil
 	short nTorpedos; //Numero de torpedos

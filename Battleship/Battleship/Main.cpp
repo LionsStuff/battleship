@@ -172,8 +172,8 @@ void actualizarMapa(char** mapa, vector<Barco>& barcos) {
 		for (short j = 0; j < (barcos[i].vision - 1); j++) {
 			chars[j] = barcoChars[barcos[i].tipo];
 		}
-
 		chars[barcos[i].vision - 1] = '+';
+
 		for (short j = 0; j < barcos[i].vision; j++) {
 			//cout << barcos[i].coordsBarco[j][0] << "," << barcos[i].coordsBarco[j][1] - 1 << endl;
 			mapa[(barcos[i].coordsBarco[j][0] - 1)][(barcos[i].coordsBarco[j][1] - 1)] = chars[j];
