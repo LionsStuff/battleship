@@ -72,10 +72,10 @@ El lugar del mapa se calcula de la siguiente forma:
 ```mapa[indice de X][indice de Y]```
 
 Donde en ```indice de X/Y``` = (<blue>barcos[i]</blue>.<lime>coordsBarco[j]</lime><orange>[0/1]</orange><violet> - 1</violet>)
-- <blue>Del barco 'i' (es decir el actual)</blue>
-- <lime>Agarrar las coordenadas del bloque 'j' (bloque actual)</lime>
-- <orange>Obtener las de 'X' (0) y 'Y' (1).
-- <violet>Y restar uno ya que los indices inician en 0 y las coordenadas en 1</violet>
+- <blue>barcos[i]: Del barco 'i' (es decir el actual)</blue>
+- <lime>coordsBarco[j]: Agarrar las coordenadas del bloque 'j' (bloque actual)</lime>
+- <orange>[0/1]: Obtener las de 'X' (0) y 'Y' (1).
+- <violet>- 1: Y restar uno ya que los indices inician en 0 y las coordenadas en 1</violet>
 
 ```
     for (short j = 0; j < barcos[i].vision; j++) {
