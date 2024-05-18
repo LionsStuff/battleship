@@ -82,3 +82,8 @@ Donde en ```indice de X/Y``` = (<blue>barcos[i]</blue>.<lime>coordsBarco[j]</lim
         mapa[(barcos[i].coordsBarco[j][0] - 1)][(barcos[i].coordsBarco[j][1] - 1)] = chars[j];
     }
 ```
+
+
+### ``` imprimirInfoBarcos() ```
+Imprime los barcos aliados restante. Imprime el nombre, las coordenadas de Popa y coordenadas de Proa.
+
