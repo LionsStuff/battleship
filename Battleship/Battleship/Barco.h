@@ -1,5 +1,6 @@
 #pragma once
 #include <iostream>
+#include <vector>
 
 using namespace std;
 
@@ -7,7 +8,7 @@ class Barco {
 public:
 	Barco();
 	Barco(short);
-	Barco(short, short[2], short[2], short);
+	Barco(short, short[2], short[2]);
 	~Barco();
 	string nombre; //Nombre de barco
 	short tipo; //Tipo de barco 0,1,2
@@ -23,9 +24,10 @@ public:
 	short aumentoRadar; //Cuanto aumenta el radar al activarlo
 	bool activo; //Si el barco esta activo o hundido
 
-	void colocacionBarco(char**, short, short);
-	bool moverBarco(bool);
-	bool rotarBarco(bool);
-	bool barcoEnPosicionValida(short modif = 0, short modifDireccion = 0);
-	void completarCoords(short modifDireccion = 0);
+	void colocacionBarco(char**, short, short, vector<Barco>&);
+	bool moverBarco(char**,bool, vector<Barco>& barcos);
+	bool rotarBarco(char**,bool, vector<Barco>& barcos);
+	bool barcoEnPosicionValida(char**, vector<Barco>&, short modif = 0, short modifDireccion = 0);
+	void completarCoords();
+	void getDireccion();
 };

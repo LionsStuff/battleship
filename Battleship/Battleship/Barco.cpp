@@ -34,20 +34,22 @@ Barco::Barco(short tipo) {
     activo = true;
 };
 
-Barco::Barco(short tipo, short coordsProa[2], short coordsPopa[2], short direccionManual) {
+Barco::Barco(short tipo, short coordsPopa[2], short coordsProa[2]) {
     nombre = "";
     this->tipo = tipo;
     for (short i = 0; i < 2; ++i) {
-        proa[i] = coordsProa[i];
         popa[i] = coordsPopa[i];
+        proa[i] = coordsProa[i];
     }
-    direccion = direccionManual;
+    direccion = -1;
+    getDireccion();
+    completarCoords();
     vida = csteVida[tipo];
     vision = csteVision[tipo];
     alcance = csteAlcance[tipo];
     nTorpedos = csteNTorpedos[tipo];
     aumentoRadar = csteAumentoRadar[tipo];
-    activo = true;
+    activo = true; //Falta checar que si vida es 0, quitar activo
 };
 
 Barco::~Barco() {};
@@ -56,7 +58,7 @@ Barco::~Barco() {};
 
 //Solo pregunta por coordenadas de popa y la direccion para hacer una colocaciion rapida
 //Falta validacion
-void Barco::colocacionBarco(char** mapa, short popaX, short popaY) {
+void Barco::colocacionBarco(char** mapa, short popaX, short popaY, vector<Barco>& barcos) {
     popa[0] = popaX;
     popa[1] = popaY;
 
@@ -67,29 +69,22 @@ void Barco::colocacionBarco(char** mapa, short popaX, short popaY) {
         cout << "5. Suroeste  " << "6.   Sur     " << "7. Sureste    " << endl << ": ";
         cin >> direccion;
         completarCoords();
-        if (!barcoEnPosicionValida()) { cout << "Direccion del barco no es valida." << endl; }
-    } while (!barcoEnPosicionValida());
+        if (!barcoEnPosicionValida(mapa, barcos, 0, 0)) { cout << "Direccion del barco no es valida." << endl; }
+    } while (!barcoEnPosicionValida(mapa, barcos, 0, 0));
     for (short i = 0; i < vision; i++) {
         //Antes de confirmar, coloca un simbolo momentario para previsualizar la posicion del barco
-        mapa[(coordsBarco[i][0] - 1)][(coordsBarco[i][1] - 1)] = '?';
+        if (mapa[(coordsBarco[i][0] - 1)][(coordsBarco[i][1] - 1)] == '~') {
+            mapa[(coordsBarco[i][0] - 1)][(coordsBarco[i][1] - 1)] = '?';
+        }
+        else {
+            cout << "Ya hay un barco en el camino." << endl;
+        }
+        
     }
 }
 
 //Completa las coordenadas de cada "pedazo" del barco
-void Barco::completarCoords(short modifDireccion) {
-    short direccion;
-
-    //Le agrega modifDirrecion on a la direccion (local)
-    //Los ifs permiten dar vueltas al reloj. Que 0 siga despues de 7 y que 7 sea antes que el 0s
-    direccion = this->direccion;
-    direccion += modifDireccion;
-    if (direccion > 7) {
-        direccion = 0;
-    }
-    else if (direccion < 0) {
-        direccion = 7;
-    }
-    
+void Barco::completarCoords() {
     //Va agregando, restando o haciendo nada respecto al vector
     //Usa a popa como referencia y los espacios que el bloque i esta de esa popa y en que direccion "se aleja"
     for (short i = 0; i < vision; i++) {
@@ -103,31 +98,55 @@ void Barco::completarCoords(short modifDireccion) {
 }
 
 //Mover barco a Proa o Popa
-bool Barco::moverBarco(bool aProa) {
+bool Barco::moverBarco(char**mapa, bool aProa, vector<Barco>& barcos) {
     short modif;
     if (aProa) { modif = 1; }
     else { modif = -1; }
 
-    if (barcoEnPosicionValida(modif)) {
-        popa[0] += vectorMovimientoEnX[direccion] * modif;
-        popa[1] += vectorMovimientoEnY[direccion] * modif;
-        completarCoords();
+    popa[0] += vectorMovimientoEnX[direccion] * modif;
+    popa[1] += vectorMovimientoEnY[direccion] * modif;
+    completarCoords();
+
+    if (barcoEnPosicionValida(mapa, barcos, 0, 0)) {
         return true;
     }
+
+    popa[0] -= vectorMovimientoEnX[direccion] * modif;
+    popa[1] -= vectorMovimientoEnY[direccion] * modif;
+    completarCoords();
     return false;
 }
 
 //HERE
 //Rotar barco a Babor o Estribor
-bool Barco::rotarBarco(bool aBabor) {
+bool Barco::rotarBarco(char**mapa, bool aBabor, vector<Barco>& barcos) {
     short modif, modifDireccion;
     if (aBabor) { modifDireccion = 1; }
     else { modifDireccion = -1; }
 
-    if (barcoEnPosicionValida(0, modifDireccion)) {
-        completarCoords(modifDireccion);
+    direccion += modifDireccion;
+    if (direccion > 7) {
+        direccion = 0;
+    }
+    else if (direccion < 0) {
+        direccion = 7;
+    }
+    completarCoords();
+
+
+    if (barcoEnPosicionValida(mapa, barcos, 0, 0)) {
         return true;
     }
+    direccion -= modifDireccion;
+
+
+    if (direccion > 7) {
+        direccion = 0;
+    }
+    else if (direccion < 0) {
+        direccion = 7;
+    }
+    completarCoords();
     return false;
 }
 
@@ -135,7 +154,7 @@ bool Barco::rotarBarco(bool aBabor) {
 //Valida si no se sale del mapa
 //POR HACER: Que no se sobreescriba con un barco
 //Modif solo puede ser -1 para validar al revez, 0 para el mismo lugar, 1 para al derecho
-bool Barco::barcoEnPosicionValida(short modif, short modifDireccion) {
+bool Barco::barcoEnPosicionValida(char** mapa, vector<Barco>& barcos, short modif, short modifDireccion ) {
     short direccion = this->direccion;
 
     //Le agrega modifDirrecion on a la direccion (local)
@@ -147,36 +166,53 @@ bool Barco::barcoEnPosicionValida(short modif, short modifDireccion) {
         direccion = 7;
     }
 
-    //En caso de que el modif no sea 0, se multiplica con el vector
     short vX = vectorMovimientoEnX[direccion];
     short vY = vectorMovimientoEnY[direccion];
-    if (modif != 0) {
-        vX *= modif;
-        vY *= modif;
-    }
 
-    for (short i = 0; i < vision; i ++) {
-        //Para los primeros dos ifs, se usa algo similar a completarCoords
-        
-        //Va a validar por cada uno de las coordenadas del barco que no se salga del mapa
-        //La unica diferencia es que la direccion esta modificada (o no) por modifDireccion.
-        //Esto sirve sobretodo para la funcion rotar, validar el +/- 45 grados que va a rotar
-        //Y el vector puede verse modificado (o no) por modif. 
-        //Esto sirve sobretodo para la funcion mover, validar +/- 1 espacio que va moverse
-        
-        //Validar mayor a tamaño de mapa
-        if ((coordsBarco[i][0] + (vX * i) > MAX_MAPA_XCOL) || (coordsBarco[i][1] + (vY * i) > MAX_MAPA_YROW)) {
+    /*
+    for (short i = 0; i < vision; i++) {
+        if ((coordsBarco[i][0] > MAX_MAPA_XCOL) || (coordsBarco[i][1] > MAX_MAPA_YROW)) {
+            cout << "El barco se sale del mapa." << endl;
             return false;
         }
-        //Validar coordenadas negativas
-        if ((coordsBarco[i][0] + (vX * i) < 1) || (coordsBarco[i][1] + (vY * i) < 1)) {
+        if ((coordsBarco[i][0] < 1) || (coordsBarco[i][1] < 1)) {
+            cout << "El barco se sale del mapa." << endl;
             return false;
         }
-        //FALTA validar si encima de barcos
+        
+        if (mapa[(coordsBarco[i][0] - 1)][(coordsBarco[i][1] - 1)] != '~') {
+            for (short b = 0; b < barcos.size(); b++) {
+                if (barcos[b].nombre != nombre) {
+                    for (short j = 0; j < barcos[b].vision; j++) {
+                        if ((coordsBarco[i][0] == barcos[b].coordsBarco[j][0]) || (coordsBarco[i][1] == barcos[b].coordsBarco[j][1])) {
+                            cout << "Hay un barco en el camino. " << endl;
+                            return false;
+                        }
+                    }
+                }
+            }
+        }
     }
+    */
+
     return true;
 }
 
+void Barco::getDireccion() {
+    short xDirection;
+    short yDirection;
+    xDirection = (popa[0] == proa[0]) ? 0 : (popa[0] < proa[0]) ? 1 : -1;
+    yDirection = (popa[1] == proa[1]) ? 0 : (popa[1] < proa[1]) ? 1 : -1;
+    
+    for (short i = 0; i < 8; i++) {
+        if ((vectorMovimientoEnX[i] == xDirection) && (vectorMovimientoEnY[i] == yDirection)) {
+            direccion = i;
+            return;
+        }
+    }
+
+    direccion = -1;
+}
 
 /*for (short i = 0; i < vision; i += (vision - 1)) {
     if ((popa[0] + (vX * i) > maxX) && (popa[1] + (vY * i) > maxY) && (proa[0] + (vX * i) > maxX) && (proa[0] + (vY * i) > maxX)) {
