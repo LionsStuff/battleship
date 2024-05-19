@@ -73,7 +73,7 @@ void Barco::colocacionBarco(char** mapa, short popaX, short popaY, vector<Barco>
     } while (!barcoEnPosicionValida(mapa, barcos, 0, 0));
     for (short i = 0; i < vision; i++) {
         //Antes de confirmar, coloca un simbolo momentario para previsualizar la posicion del barco
-        if (mapa[(coordsBarco[i][0] - 1)][(coordsBarco[i][1] - 1)] == '~') {
+        if ((mapa[(coordsBarco[i][0] - 1)][(coordsBarco[i][1] - 1)] == ':') || (mapa[(coordsBarco[i][0] - 1)][(coordsBarco[i][1] - 1)] == '=')) {
             mapa[(coordsBarco[i][0] - 1)][(coordsBarco[i][1] - 1)] = '?';
         }
         else {

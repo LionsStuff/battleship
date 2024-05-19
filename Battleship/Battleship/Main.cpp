@@ -77,7 +77,7 @@ void main() {
 	while (inLoop) {
 		imprimirMapa(mapa);
 		imprimirInfoBarcos(barcos);
-		cout << "1. Mover     2. Rotar" << endl;
+		cout << "1. Mover	2. Rotar	3.Atacar	4.Radar profundo	5.Salir" << endl;
 		cin >> inputOpcion;
 		cin.ignore();
 		cout << "Ingrese el nombre del barco: " << endl;
@@ -107,6 +107,12 @@ void main() {
 					if (!barcos[i].rotarBarco(mapa, !direccionMovimiento, barcos)) {
 						cout << "Movimiento ilegal." << endl;
 					}
+					actualizarMapa(mapa, barcos);
+					break;
+				case 3: //Atacar
+					break;
+				case 4: //Radar profundo
+					break;
 				default:
 					inLoop = false;
 					break;
@@ -127,7 +133,7 @@ void main() {
 void limpiarMapa(char ** mapa) {
 	for (short i = 0; i < MAX_MAPA_YROW; i++) {
 		for (short j = 0; j < MAX_MAPA_XCOL; j++) {
-			mapa[j][i] = '~';
+			mapa[j][i] = '=';
 		}
 	}
 }
@@ -168,6 +174,23 @@ void actualizarMapa(char** mapa, vector<Barco>& barcos) {
 	limpiarMapa(mapa);
 	char chars[5] = "";
 	
+	for (short i = 0; i < barcos.size(); i++) {
+		if (/*barcos[i].nombre.substr(0, 2) == "al"*/true) {
+			for (short j = 0; j < barcos[i].vision; j++) {
+				for (short y = (barcos[i].coordsBarco[j][1] - barcos[i].vision); y <= (barcos[i].coordsBarco[j][1] + barcos[i].vision); y++) {
+					if (y > 0 && y <= MAX_MAPA_YROW) {
+						for (short x = (barcos[i].coordsBarco[j][0] - barcos[i].vision); x <= (barcos[i].coordsBarco[j][0] + barcos[i].vision); x++) {
+							if (x > 0 && x <= MAX_MAPA_XCOL) {
+								mapa[(x - 1)][(y - 1)] = ':';
+							}
+						}
+					}
+				}
+			}
+		}
+
+	}
+
 	for (short i = 0; i < barcos.size(); i++) {
 		for (short j = 0; j < (barcos[i].vision - 1); j++) {
 			chars[j] = barcoChars[barcos[i].tipo];
@@ -246,7 +269,7 @@ Barco colocarNuevoBarco(short* nBarcos, vector<Barco>& barcos) {
 			if ((popaX > MAX_MAPA_XCOL) || (popaY > MAX_MAPA_YROW) || (popaX < 1) || (popaY < 1)) {
 				cout << "Posicion de coordenadas invalida" << endl;
 			}
-			else if (mapa[(popaX - 1)][(popaY - 1)] != '~'){
+			else if ((mapa[(popaX - 1)][(popaY - 1)] != ':') && (mapa[(popaX - 1)][(popaY - 1)] != '=')) {
 				cout << "Ya hay un barco en esas coordenadas" << endl;
 			}
 			else {
@@ -269,7 +292,7 @@ Barco colocarNuevoBarco(short* nBarcos, vector<Barco>& barcos) {
 			//Mapa[x][y]
 			//barco1.coords[indice de un bloque del barco][0 para x y 1 para y] - 1
 			//-1 ya que las coords son una cosa y el indice es otro. El mapa trabaja en indices.
-			mapa[(barco1.coordsBarco[i][0] - 1)][(barco1.coordsBarco[i][1] - 1)] = '~';
+			mapa[(barco1.coordsBarco[i][0] - 1)][(barco1.coordsBarco[i][1] - 1)] = '=';
 		}
 		system("cls");
 	}while (true);
