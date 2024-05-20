@@ -16,7 +16,7 @@ using namespace std;
 #define nAcorazado 1
 #define nDestructor 1
 
-#define MAX_LINEAS_ARCHIVO 50
+#define MAX_LINEAS_ARCHIVO 20
 
 #define strBarcoAliado "al"
 
@@ -51,25 +51,21 @@ void main() {
 	lecturaBarcos(barcos);
 	actualizarMapa(mapa, barcos);
 	cout << "Barcos cargados." << endl;
-	char temp;
-	cin >> temp;
-
-	short temporalCounter = 0;
+	system("pause");
 	
 	//FASE COLOCACION BARCOS
 	while (true) {
 		if ((nBarcos[0] + nBarcos[1] + nBarcos[2]) <= 0) {
 			break;
 		}
+		system("cls");
+		actualizarMapa(mapa, barcos);
 		imprimirMapa(mapa);
 		cout << "Barcos restantes por colocar: ";
 		cout << "Fragata: " << nBarcos[0] << " | "
 			<< "Acorazado: " << nBarcos[1] << " | "
 			<< "Destructor: " << nBarcos[2] << endl;
 		barcos.push_back(colocarNuevoBarco(nBarcos, barcos));
-		actualizarMapa(mapa, barcos);
-		temporalCounter++;
-		system("cls");
 	}
 
 
@@ -79,6 +75,8 @@ void main() {
 
 	//FASE PRINCIPAL DE JUEGO
 	while (inLoop) {
+		system("cls");
+		actualizarMapa(mapa, barcos);
 		imprimirMapa(mapa);
 		imprimirInfoBarcos(barcos);
 		cout << "1. Mover	2. Rotar	3.Atacar	4.Radar superficial		5.Radar profundo	6.Salir" << endl;
@@ -98,34 +96,30 @@ void main() {
 					cout << "Mover" << endl << "1. A Proa (adelante)" << endl << "2. A Popa (atrás)" << endl;
 					cin >> direccionMovimiento;
 					direccionMovimiento--; //Reutilizar la variable como boolean (0 y 1 tambien funciona como false y true)
-					system("cls");
 					if (!barcos[i].moverBarco(mapa, !direccionMovimiento, barcos)) {
 						cout << "Movimiento ilegal." << endl;
+						system("pause");
 					}
-					actualizarMapa(mapa, barcos);
 					break;
 				case 2: //Rotar
 					cout << "Rotar" << endl << "1. A Babor (Contra-Manecillas)" << endl << "2. A Estribor (Manecillas)" << endl;
 					cin >> direccionMovimiento;
 					direccionMovimiento--;
-					system("cls");
 					if (!barcos[i].rotarBarco(mapa, !direccionMovimiento, barcos)) {
 						cout << "Movimiento ilegal." << endl;
+						system("pause");
 					}
-					actualizarMapa(mapa, barcos);
 					break;
 				case 3:
 					colocacionAtaque(mapa, barcos);
-					actualizarMapa(mapa, barcos);
-					system("cls");
+					system("pause");
 					break;
 				case 4: //Radar superficial
 					system("cls");
 					actualizarMapa(mapa, barcos, barcos[i].nombre);
 					imprimirMapa(mapa);
 					cout << "Radar Superficial activado por " << barcos[i].nombre << endl;
-					cin >> temp;
-					actualizarMapa(mapa, barcos);
+					system("pause");
 					break;
 				case 5: //Radar profundo
 					break;
@@ -336,11 +330,11 @@ void colocacionAtaque(char** mapa, vector<Barco>&barcos)
 {
 	short ataquex, ataquey;
 	char foo = 'y';
-	char temp;
 	do
 	{
 		do
 		{
+			//Ingeso de coordenadas
 			cout << "Ingrese las cooordenadas que ataca. " << endl << "X: ";
 			cin >> ataquex;
 			cout << "Y: ";
@@ -354,6 +348,7 @@ void colocacionAtaque(char** mapa, vector<Barco>&barcos)
 			}
 		} while (true);
 
+		//Coloca un signo de interrogacion donde va ha ser el ataque y pide confirmacion
 		mapa[(ataquex - 1)][(ataquey - 1)] = '?';
 		system("cls");
 		imprimirMapa(mapa);
@@ -372,12 +367,18 @@ void colocacionAtaque(char** mapa, vector<Barco>&barcos)
 
 	} while (true);
 
+	//Por predeterminado pone el simbolo correspondiente a fallido
 	system("cls");
 	mapa[(ataquex - 1)][(ataquey - 1)] = ',';
 
+	//Va a buscar por cada barco
 	for (short i = 0; i < barcos.size(); i++) {
+		//Llama a la funcion atacar
 		if (barcos[i].ataque(ataquex, ataquey))
 		{
+			//Si el barco esta hundido, no pasa nada
+			//Si esta activo, coloca una x, y reduce la vida
+			//En caso de que sea el ultimo golpe posible, el barco se convierte en hundido
 			if (barcos[i].activo) {
 				mapa[(ataquex - 1)][(ataquey - 1)] = 'X';
 				imprimirMapa(mapa);
@@ -392,14 +393,11 @@ void colocacionAtaque(char** mapa, vector<Barco>&barcos)
 				imprimirMapa(mapa);
 				cout << "Le pegaste a un naufragio." << endl;
 			}
-
-			cin >> temp;
 			return;
 		}
 	}
 	imprimirMapa(mapa);
 	cout << "Ataque fallido." << endl;
-	cin >> temp;
 }
 
 

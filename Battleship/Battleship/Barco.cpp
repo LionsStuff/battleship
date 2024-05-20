@@ -221,7 +221,7 @@ bool Barco::ataque(short ataquex, short ataquey)
 {
     for (short i = 0; i < vision; i++)
     {
-        if (coordsBarco[i][0] == ataquex && coordsBarco[i][1] == ataquey)
+        if (coordsBarco[i][0] == ataquex && coordsBarco[i][1] == ataquey && coordsVida[i] == 1)
         {
             coordsVida[i] = 0;
             vida--;
