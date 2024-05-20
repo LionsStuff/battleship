@@ -8,6 +8,7 @@
 using namespace std;
 
 //Limites del mapa
+//SE DEBA ACTUALIZAR TAMBIEN EN BARCO.CPP para validacion de barco
 #define MAX_MAPA_XCOL 30
 #define MAX_MAPA_YROW 20
 
@@ -17,14 +18,17 @@ using namespace std;
 
 #define MAX_LINEAS_ARCHIVO 50
 
+#define strBarcoAliado "al"
+
 char** mapa;
 
 void limpiarMapa(char**);
 void imprimirMapa(char**);
-void actualizarMapa(char**, vector<Barco>&);
+void actualizarMapa(char**, vector<Barco>&, string nombreRadar = "");
 Barco colocarNuevoBarco(short*, vector<Barco>&);
 void imprimirInfoBarcos(vector<Barco>&);
 void lecturaBarcos(vector<Barco>&);
+void colocacionAtaque(char**, vector<Barco>&);
 
 enum tipo { FRAGATA, ACORAZADO, DESTRUCTOR };
 
@@ -77,9 +81,10 @@ void main() {
 	while (inLoop) {
 		imprimirMapa(mapa);
 		imprimirInfoBarcos(barcos);
-		cout << "1. Mover	2. Rotar	3.Atacar	4.Radar profundo	5.Salir" << endl;
+		cout << "1. Mover	2. Rotar	3.Atacar	4.Radar superficial		5.Radar profundo	6.Salir" << endl;
 		cin >> inputOpcion;
 		cin.ignore();
+		if (inputOpcion == 6) { break; }
 		cout << "Ingrese el nombre del barco: " << endl;
 		getline(cin, nombreBarco);
 
@@ -109,9 +114,20 @@ void main() {
 					}
 					actualizarMapa(mapa, barcos);
 					break;
-				case 3: //Atacar
+				case 3:
+					colocacionAtaque(mapa, barcos);
+					actualizarMapa(mapa, barcos);
+					system("cls");
 					break;
-				case 4: //Radar profundo
+				case 4: //Radar superficial
+					system("cls");
+					actualizarMapa(mapa, barcos, barcos[i].nombre);
+					imprimirMapa(mapa);
+					cout << "Radar Superficial activado por " << barcos[i].nombre << endl;
+					cin >> temp;
+					actualizarMapa(mapa, barcos);
+					break;
+				case 5: //Radar profundo
 					break;
 				default:
 					inLoop = false;
@@ -169,17 +185,24 @@ void imprimirMapa(char** mapa) {
 }
 
 //Guarda en el simbolo que representa a los barcos en el mapa
-void actualizarMapa(char** mapa, vector<Barco>& barcos) {
+void actualizarMapa(char** mapa, vector<Barco>& barcos, string nombreRadar) {
 	char barcoChars[] = { 'F','A','D' };
 	limpiarMapa(mapa);
 	char chars[5] = "";
+	short vision;
 	
 	for (short i = 0; i < barcos.size(); i++) {
-		if (/*barcos[i].nombre.substr(0, 2) == "al"*/true) {
+		if (barcos[i].nombre == nombreRadar) {
+			vision = barcos[i].vision + barcos[i].aumentoRadar;
+		}
+		else {
+			vision = barcos[i].vision;
+		}
+		if (/*barcos[i].nombre.substr(0, 2) == strBarcoAliado*/true) {
 			for (short j = 0; j < barcos[i].vision; j++) {
-				for (short y = (barcos[i].coordsBarco[j][1] - barcos[i].vision); y <= (barcos[i].coordsBarco[j][1] + barcos[i].vision); y++) {
+				for (short y = (barcos[i].coordsBarco[j][1] - vision); y <= (barcos[i].coordsBarco[j][1] + vision); y++) {
 					if (y > 0 && y <= MAX_MAPA_YROW) {
-						for (short x = (barcos[i].coordsBarco[j][0] - barcos[i].vision); x <= (barcos[i].coordsBarco[j][0] + barcos[i].vision); x++) {
+						for (short x = (barcos[i].coordsBarco[j][0] - vision); x <= (barcos[i].coordsBarco[j][0] + vision); x++) {
 							if (x > 0 && x <= MAX_MAPA_XCOL) {
 								mapa[(x - 1)][(y - 1)] = ':';
 							}
@@ -193,9 +216,18 @@ void actualizarMapa(char** mapa, vector<Barco>& barcos) {
 
 	for (short i = 0; i < barcos.size(); i++) {
 		for (short j = 0; j < (barcos[i].vision - 1); j++) {
-			chars[j] = barcoChars[barcos[i].tipo];
+			if (barcos[i].coordsVida[j] == 1) {
+				chars[j] = barcoChars[barcos[i].tipo];
+			}
+			else {
+				chars[j] = 'x';
+			}
 		}
 		chars[barcos[i].vision - 1] = '+';
+		if (barcos[i].coordsVida[barcos[i].vision - 1] != 1) {
+			chars[barcos[i].vision - 1] = 'x';
+		}
+		
 
 		for (short j = 0; j < barcos[i].vision; j++) {
 			//cout << barcos[i].coordsBarco[j][0] << "," << barcos[i].coordsBarco[j][1] - 1 << endl;
@@ -209,7 +241,7 @@ void imprimirInfoBarcos(vector<Barco>& barcos) {
 	for (short i = 0; i < barcos.size(); i++) {
 		//Checa si el barco no esta hundido y si es nuestro ("ya que los nuestros inician con 'al')
 		if (barcos[i].activo && (barcos[i].nombre[0] == 'a') && (barcos[i].nombre[1] == 'l')) {
-			cout << barcos[i].nombre << "     Popa(" << barcos[i].popa[0] << "," << barcos[i].popa[1] << ")" << "     Proa(" << barcos[i].proa[0] << "," << barcos[i].proa[1] << ")" << endl;
+			cout << barcos[i].nombre << "	Popa(" << barcos[i].popa[0] << "," << barcos[i].popa[1] << ")" << "	Proa(" << barcos[i].proa[0] << "," << barcos[i].proa[1] << ")" << "		Vida: " << barcos[i].vida << endl;
 		}
 	}
 	cout << "-----------------------------------" << endl;
@@ -245,7 +277,7 @@ Barco colocarNuevoBarco(short* nBarcos, vector<Barco>& barcos) {
 		if (!barcoValido) { cout << "Colocacion de barco inválida. " << endl; continue; }
 
 		//Reduce el numero de barcos del tipo disponibles y genera un nombre segun la sintaxis
-		nombre = "al";
+		nombre = strBarcoAliado;
 		nombre += charTipo;
 		nombre += to_string(nMaxes[intTipo] - nBarcos[intTipo] + 1);
 		nBarcos[intTipo]--;
@@ -298,6 +330,76 @@ Barco colocarNuevoBarco(short* nBarcos, vector<Barco>& barcos) {
 	}while (true);
 
 	return barco1;
+}
+
+void colocacionAtaque(char** mapa, vector<Barco>&barcos)
+{
+	short ataquex, ataquey;
+	char foo = 'y';
+	char temp;
+	do
+	{
+		do
+		{
+			cout << "Ingrese las cooordenadas que ataca. " << endl << "X: ";
+			cin >> ataquex;
+			cout << "Y: ";
+			cin >> ataquey;
+			//Validar mayor a tamaño de mapa o en negativas     
+			if ((ataquex > MAX_MAPA_XCOL) || (ataquey > MAX_MAPA_YROW) || (ataquex < 1) || (ataquey < 1)) {
+				cout << "Posicion de coordenadas invalida" << endl;
+			}
+			else {
+				break;
+			}
+		} while (true);
+
+		mapa[(ataquex - 1)][(ataquey - 1)] = '?';
+		system("cls");
+		imprimirMapa(mapa);
+		
+		cout << endl;
+		cout << "¿ATAQUE FINAL?: ";
+		cin >> foo;
+		if (foo != 'n')
+		{
+			break;
+		}
+		else
+		{
+			mapa[(ataquex - 1)][(ataquey - 1)] = '=';
+		}
+
+	} while (true);
+
+	system("cls");
+	mapa[(ataquex - 1)][(ataquey - 1)] = ',';
+
+	for (short i = 0; i < barcos.size(); i++) {
+		if (barcos[i].ataque(ataquex, ataquey))
+		{
+			if (barcos[i].activo) {
+				mapa[(ataquex - 1)][(ataquey - 1)] = 'X';
+				imprimirMapa(mapa);
+				cout << "¡Dio en el blanco (negro) !" << endl;
+				if (barcos[i].vida <= 0) {
+					barcos[i].activo = false;
+					cout << "BARCO HUNDIDO!" << endl;
+				}
+			}
+			else {
+				actualizarMapa(mapa, barcos);
+				imprimirMapa(mapa);
+				cout << "Le pegaste a un naufragio." << endl;
+			}
+
+			cin >> temp;
+			return;
+		}
+	}
+	imprimirMapa(mapa);
+	cout << "Ataque fallido." << endl;
+	cin >> temp;
 }
 
 
@@ -370,15 +472,19 @@ void lecturaBarcos(vector<Barco>& barcos) {
 		Barco barcoText = Barco(Rtiposhort, RPopaArr, RProaArr);
 
 		barcoText.nombre = RNombre;
-		barcoText.vida = 0;
-
 
 		//Momentaneo, falta traducir a coords y no solo suma
 		for (short v = 0; v < Rvidas.size(); v++) {
-			if (Rvidas[v] == '1') {
-				barcoText.vida++;
+			if (Rvidas[v] != '1') {
+				barcoText.vida--;
+				barcoText.coordsVida[v] = 0;
+			}
+			else {
+				barcoText.coordsVida[v] = 1;
 			}
 		}
+
+		barcoText.activo = (barcoText.vida <= 0) ? false : true;
 
 		/*cout << endl;
 		cout << barcoText.tipo << endl;

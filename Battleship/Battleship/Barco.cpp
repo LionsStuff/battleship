@@ -32,6 +32,9 @@ Barco::Barco(short tipo) {
     nTorpedos = csteNTorpedos[tipo];
     aumentoRadar = csteAumentoRadar[tipo];
     activo = true;
+    for (short i = 0; i < vida; i++) {
+        coordsVida[i] = 1;
+    }
 };
 
 Barco::Barco(short tipo, short coordsPopa[2], short coordsProa[2]) {
@@ -213,6 +216,21 @@ void Barco::getDireccion() {
 
     direccion = -1;
 }
+
+bool Barco::ataque(short ataquex, short ataquey)
+{
+    for (short i = 0; i < vision; i++)
+    {
+        if (coordsBarco[i][0] == ataquex && coordsBarco[i][1] == ataquey)
+        {
+            coordsVida[i] = 0;
+            vida--;
+            return true;
+        }
+    }
+    return false;
+}
+
 
 /*for (short i = 0; i < vision; i += (vision - 1)) {
     if ((popa[0] + (vX * i) > maxX) && (popa[1] + (vY * i) > maxY) && (proa[0] + (vX * i) > maxX) && (proa[0] + (vY * i) > maxX)) {
