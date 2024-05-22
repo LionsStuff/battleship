@@ -21,9 +21,15 @@
     <ClCompile Include="Barco.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Torpedo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Barco.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Torpedo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

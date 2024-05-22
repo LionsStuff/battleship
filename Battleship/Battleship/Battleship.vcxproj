@@ -129,9 +129,11 @@
   <ItemGroup>
     <ClCompile Include="Barco.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="Torpedo.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Barco.h" />
+    <ClInclude Include="Torpedo.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

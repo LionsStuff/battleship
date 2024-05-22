@@ -4,6 +4,7 @@
 #include <vector>
 #include <fstream>
 #include "Barco.h"
+#include "Torpedo.h"
 
 using namespace std;
 
@@ -29,6 +30,7 @@ Barco colocarNuevoBarco(short*, vector<Barco>&);
 void imprimirInfoBarcos(vector<Barco>&);
 void lecturaBarcos(vector<Barco>&);
 void colocacionAtaque(char**, vector<Barco>&);
+bool radarProfundo(vector<Torpedo>&, Barco, char**);
 
 enum tipo { FRAGATA, ACORAZADO, DESTRUCTOR };
 
@@ -37,6 +39,14 @@ void main() {
 
 	//Enum de los tipos de barco y crear un vector de barcos
 	vector<Barco> barcos;
+	vector<Torpedo> torpedos;
+
+	//TORPEDO MOMENTANEO
+	short coordsTorpedo[2] = {8,8};
+	Torpedo torpedo1 = Torpedo(coordsTorpedo, 0);
+	torpedos.push_back(torpedo1);
+	//TORPEDO MOMENTANEO
+
 	short nBarcos[nFragata + nAcorazado + nDestructor] = { nFragata, nAcorazado, nDestructor };
 
 	//Inicializacion del mapa
@@ -87,8 +97,9 @@ void main() {
 		getline(cin, nombreBarco);
 
 		//Busca el nombre de barco e ingresa al menu si existe
+		//Tambien detecta si esta vivo
 		for (short i = 0; i < barcos.size(); i++) {
-			if (barcos[i].nombre == nombreBarco) {
+			if (barcos[i].nombre == nombreBarco && barcos[i].activo) {
 
 				//Menu de opciones
 				switch (inputOpcion) {
@@ -122,10 +133,38 @@ void main() {
 					system("pause");
 					break;
 				case 5: //Radar profundo
+					if (radarProfundo(torpedos, barcos[i], mapa)) {
+						system("cls");
+						imprimirMapa(mapa);
+						cout << "TORPEDO ENCONTRADO!!!" << endl;
+						system("pause");
+					}
+					else {
+						system("cls");
+						imprimirMapa(mapa);
+						cout << "No se encontró ninguna amenaza. " << endl;
+						//Checar coords de primer torpedo
+						//cout << "Coordenada torpedo: " << torpedos[0].coordsTorpedo[0] << "," << torpedos[0].coordsTorpedo[1] << endl;
+						system("pause");
+					}
 					break;
 				default:
 					inLoop = false;
 					break;
+				}
+			}
+
+		}
+
+		//Mover torpedos
+		for (short i = 0; i < torpedos.size(); i++) {
+			if(torpedos[i].activo){
+				if (torpedos[i].moverTorpedo(barcos)) {
+					system("cls");
+					actualizarMapa(mapa, barcos);
+					imprimirMapa(mapa);
+					cout << "UN TORPEDO A EXPLOTADO UN BARCO! " << endl;
+					system("pause");
 				}
 			}
 		}
@@ -208,6 +247,7 @@ void actualizarMapa(char** mapa, vector<Barco>& barcos, string nombreRadar) {
 
 	}
 
+	//Validar que este en vision
 	for (short i = 0; i < barcos.size(); i++) {
 		for (short j = 0; j < (barcos[i].vision - 1); j++) {
 			if (barcos[i].coordsVida[j] == 1) {
@@ -388,16 +428,35 @@ void colocacionAtaque(char** mapa, vector<Barco>&barcos)
 					cout << "BARCO HUNDIDO!" << endl;
 				}
 			}
-			else {
-				actualizarMapa(mapa, barcos);
-				imprimirMapa(mapa);
-				cout << "Le pegaste a un naufragio." << endl;
-			}
 			return;
 		}
 	}
 	imprimirMapa(mapa);
 	cout << "Ataque fallido." << endl;
+}
+
+bool radarProfundo(vector<Torpedo>& torpedos, Barco barco, char** mapa) {
+	bool hayTorpedo = false;
+	for (short j = 0; j < barco.vision; j++) {
+		for (short y = (barco.coordsBarco[j][1] - barco.vision); y <= (barco.coordsBarco[j][1] + barco.vision); y++) {
+			if (y > 0 && y <= MAX_MAPA_YROW) {
+				for (short x = (barco.coordsBarco[j][0] - barco.vision); x <= (barco.coordsBarco[j][0] + barco.vision); x++) {
+					if (x > 0 && x <= MAX_MAPA_XCOL) {
+						if (mapa[x - 1][y - 1] == ':') {
+							mapa[x - 1][y - 1] = '/';
+						}
+						for (short t = 0; t < torpedos.size(); t++) {
+							if (torpedos[t].coordsTorpedo[0] == x && torpedos[t].coordsTorpedo[1] == y && torpedos[t].activo) {
+								mapa[x - 1][y - 1] = '!';
+								hayTorpedo = true;
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	return hayTorpedo;
 }
 
 
