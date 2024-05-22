@@ -3,6 +3,7 @@
 #include <locale.h>
 #include <vector>
 #include <fstream>
+#include <windows.h> //Para sleep()
 #include "Barco.h"
 #include "Torpedo.h"
 
@@ -31,11 +32,18 @@ void imprimirInfoBarcos(vector<Barco>&);
 void lecturaBarcos(vector<Barco>&);
 void colocacionAtaque(char**, vector<Barco>&);
 bool radarProfundo(vector<Torpedo>&, Barco, char**);
+void limpiarArchivo();
+void modificarBarcos(vector<Barco>&);
 
 enum tipo { FRAGATA, ACORAZADO, DESTRUCTOR };
 
 void main() {
 	setlocale(LC_ALL, "");
+	//Turno actual del juego
+	char turnoActual = 'A';
+
+	//Turno que nos corresponde
+	char turnoAliado = 'A';
 
 	//Enum de los tipos de barco y crear un vector de barcos
 	vector<Barco> barcos;
@@ -65,19 +73,33 @@ void main() {
 	
 	//FASE COLOCACION BARCOS
 	while (true) {
-		if ((nBarcos[0] + nBarcos[1] + nBarcos[2]) <= 0) {
-			break;
+		if (turnoActual == turnoAliado) {
+			if ((nBarcos[0] + nBarcos[1] + nBarcos[2]) <= 0) {
+				break;
+			}
+			system("cls");
+			actualizarMapa(mapa, barcos);
+			imprimirMapa(mapa);
+			cout << "Barcos restantes por colocar: ";
+			cout << "Fragata: " << nBarcos[0] << " | "
+				<< "Acorazado: " << nBarcos[1] << " | "
+				<< "Destructor: " << nBarcos[2] << endl;
+			barcos.push_back(colocarNuevoBarco(nBarcos, barcos));
 		}
-		system("cls");
-		actualizarMapa(mapa, barcos);
-		imprimirMapa(mapa);
-		cout << "Barcos restantes por colocar: ";
-		cout << "Fragata: " << nBarcos[0] << " | "
-			<< "Acorazado: " << nBarcos[1] << " | "
-			<< "Destructor: " << nBarcos[2] << endl;
-		barcos.push_back(colocarNuevoBarco(nBarcos, barcos));
+		else {
+			Sleep(750);
+			system("cls");
+			cout << "Paciencia." << endl;
+			cout << "Es el turno del contricante.";
+			Sleep(750);
+			cout << ".";
+			Sleep(750);
+			cout << ".";
+		}
 	}
 
+	modificarBarcos(barcos);
+	turnoActual++;
 
 	short direccionMovimiento, inputOpcion;
 	bool inLoop = true;
@@ -85,88 +107,100 @@ void main() {
 
 	//FASE PRINCIPAL DE JUEGO
 	while (inLoop) {
-		system("cls");
-		actualizarMapa(mapa, barcos);
-		imprimirMapa(mapa);
-		imprimirInfoBarcos(barcos);
-		cout << "1. Mover	2. Rotar	3.Atacar	4.Radar superficial		5.Radar profundo	6.Salir" << endl;
-		cin >> inputOpcion;
-		cin.ignore();
-		if (inputOpcion == 6) { break; }
-		cout << "Ingrese el nombre del barco: " << endl;
-		getline(cin, nombreBarco);
+		if (turnoActual == turnoAliado) {
+			system("cls");
+			actualizarMapa(mapa, barcos);
+			imprimirMapa(mapa);
+			imprimirInfoBarcos(barcos);
+			cout << "1. Mover	2. Rotar	3.Atacar	4.Radar superficial		5.Radar profundo	6.Salir" << endl;
+			cin >> inputOpcion;
+			cin.ignore();
+			if (inputOpcion == 6) { break; }
+			cout << "Ingrese el nombre del barco: " << endl;
+			getline(cin, nombreBarco);
 
-		//Busca el nombre de barco e ingresa al menu si existe
-		//Tambien detecta si esta vivo
-		for (short i = 0; i < barcos.size(); i++) {
-			if (barcos[i].nombre == nombreBarco && barcos[i].activo) {
+			//Busca el nombre de barco e ingresa al menu si existe
+			//Tambien detecta si esta vivo
+			for (short i = 0; i < barcos.size(); i++) {
+				if (barcos[i].nombre == nombreBarco && barcos[i].activo) {
 
-				//Menu de opciones
-				switch (inputOpcion) {
-				case 1: //Mover
-					cout << "Mover" << endl << "1. A Proa (adelante)" << endl << "2. A Popa (atrás)" << endl;
-					cin >> direccionMovimiento;
-					direccionMovimiento--; //Reutilizar la variable como boolean (0 y 1 tambien funciona como false y true)
-					if (!barcos[i].moverBarco(mapa, !direccionMovimiento, barcos)) {
-						cout << "Movimiento ilegal." << endl;
+					//Menu de opciones
+					switch (inputOpcion) {
+					case 1: //Mover
+						cout << "Mover" << endl << "1. A Proa (adelante)" << endl << "2. A Popa (atrás)" << endl;
+						cin >> direccionMovimiento;
+						direccionMovimiento--; //Reutilizar la variable como boolean (0 y 1 tambien funciona como false y true)
+						if (!barcos[i].moverBarco(mapa, !direccionMovimiento, barcos)) {
+							cout << "Movimiento ilegal." << endl;
+							system("pause");
+						}
+						break;
+					case 2: //Rotar
+						cout << "Rotar" << endl << "1. A Babor (Contra-Manecillas)" << endl << "2. A Estribor (Manecillas)" << endl;
+						cin >> direccionMovimiento;
+						direccionMovimiento--;
+						if (!barcos[i].rotarBarco(mapa, !direccionMovimiento, barcos)) {
+							cout << "Movimiento ilegal." << endl;
+							system("pause");
+						}
+						break;
+					case 3:
+						colocacionAtaque(mapa, barcos);
 						system("pause");
-					}
-					break;
-				case 2: //Rotar
-					cout << "Rotar" << endl << "1. A Babor (Contra-Manecillas)" << endl << "2. A Estribor (Manecillas)" << endl;
-					cin >> direccionMovimiento;
-					direccionMovimiento--;
-					if (!barcos[i].rotarBarco(mapa, !direccionMovimiento, barcos)) {
-						cout << "Movimiento ilegal." << endl;
-						system("pause");
-					}
-					break;
-				case 3:
-					colocacionAtaque(mapa, barcos);
-					system("pause");
-					break;
-				case 4: //Radar superficial
-					system("cls");
-					actualizarMapa(mapa, barcos, barcos[i].nombre);
-					imprimirMapa(mapa);
-					cout << "Radar Superficial activado por " << barcos[i].nombre << endl;
-					system("pause");
-					break;
-				case 5: //Radar profundo
-					if (radarProfundo(torpedos, barcos[i], mapa)) {
+						break;
+					case 4: //Radar superficial
 						system("cls");
+						actualizarMapa(mapa, barcos, barcos[i].nombre);
 						imprimirMapa(mapa);
-						cout << "TORPEDO ENCONTRADO!!!" << endl;
+						cout << "Radar Superficial activado por " << barcos[i].nombre << endl;
 						system("pause");
+						break;
+					case 5: //Radar profundo
+						if (radarProfundo(torpedos, barcos[i], mapa)) {
+							system("cls");
+							imprimirMapa(mapa);
+							cout << "TORPEDO ENCONTRADO!!!" << endl;
+							system("pause");
+						}
+						else {
+							system("cls");
+							imprimirMapa(mapa);
+							cout << "No se encontró ninguna amenaza. " << endl;
+							//Checar coords de primer torpedo
+							//cout << "Coordenada torpedo: " << torpedos[0].coordsTorpedo[0] << "," << torpedos[0].coordsTorpedo[1] << endl;
+							system("pause");
+						}
+						break;
+					default:
+						inLoop = false;
+						break;
 					}
-					else {
-						system("cls");
-						imprimirMapa(mapa);
-						cout << "No se encontró ninguna amenaza. " << endl;
-						//Checar coords de primer torpedo
-						//cout << "Coordenada torpedo: " << torpedos[0].coordsTorpedo[0] << "," << torpedos[0].coordsTorpedo[1] << endl;
-						system("pause");
-					}
-					break;
-				default:
-					inLoop = false;
-					break;
 				}
+
 			}
 
+			//Mover torpedos
+			for (short i = 0; i < torpedos.size(); i++) {
+				if (torpedos[i].activo) {
+					if (torpedos[i].moverTorpedo(barcos)) {
+						system("cls");
+						actualizarMapa(mapa, barcos);
+						imprimirMapa(mapa);
+						cout << "UN TORPEDO A EXPLOTADO UN BARCO! " << endl;
+						system("pause");
+					}
+				}
+			}
 		}
-
-		//Mover torpedos
-		for (short i = 0; i < torpedos.size(); i++) {
-			if(torpedos[i].activo){
-				if (torpedos[i].moverTorpedo(barcos)) {
-					system("cls");
-					actualizarMapa(mapa, barcos);
-					imprimirMapa(mapa);
-					cout << "UN TORPEDO A EXPLOTADO UN BARCO! " << endl;
-					system("pause");
-				}
-			}
+		else {
+			Sleep(750);
+			system("cls");
+			cout << "Paciencia." << endl;
+			cout << "Es el turno del contricante.";
+			Sleep(750);
+			cout << ".";
+			Sleep(750);
+			cout << ".";
 		}
 	}
 
@@ -464,7 +498,7 @@ bool radarProfundo(vector<Torpedo>& torpedos, Barco barco, char** mapa) {
 // ~~~~ FUNCIONES DE ARCHIVOS ~~~~
 
 void lecturaBarcos(vector<Barco>& barcos) {
-	string ruta = "C:\\Users\\leona\\ODpatch\\OneDrive\\Escritorio\\barcos.txt";
+	string ruta = "C:\\Users\\leona\\ODpatch\\OneDrive\\Documents\\GitHub\\battleship\\barcos.txt";
 
 	//Incializacion para lecutra de archivos
 	fstream archivo(ruta, ios::in | ios::out);
@@ -557,4 +591,52 @@ void lecturaBarcos(vector<Barco>& barcos) {
 	}
 
 	archivo.close();
+}
+
+
+void modificarBarcos(vector<Barco>& barcos)
+{
+	limpiarArchivo("barcos.txt");
+	
+	string ruta = "C:\\Users\\leona\\ODpatch\\OneDrive\\Documents\\GitHub\\battleship\\barcos.txt";
+	fstream archivo(ruta, ios::in | ios::out | ios::app);
+	string vidaString;
+
+	char barcoChars[] = { 'F','A','D' };
+
+	if (archivo.is_open())
+	{
+		for (short i = 0; i < barcos.size(); i++)
+		{
+			vidaString = "";
+			for (int j = 0; j < barcos[i].vision; ++j)
+			{
+				vidaString += to_string(barcos[i].coordsVida[j]);
+			}
+			archivo << barcoChars[barcos[i].tipo] << "p" << "(" << barcos[i].popa[0] << "," << barcos[i].popa[1] << ")" << "-" << "(" << barcos[i].proa[0] << "," << barcos[i].proa[1] << ")" << "{" << vidaString << "}" << barcos[i].nombre;
+			archivo << endl;
+		}
+		cout << "Archivo editado" << endl;
+	}
+	else
+	{
+		cerr << "Error: No se pudo acceder al archivo" << endl; // cerr == cout, cerr hace lo mismo que cout pero se define en general que cerr va a mandar mensajes SOLAMENTE DE ERROR
+	}
+
+}
+
+void limpiarArchivo(string nombreArchivo)
+{
+	string ruta = "C:\\Users\\leona\\ODpatch\\OneDrive\\Documents\\GitHub\\battleship\\"+nombreArchivo;
+	ofstream archivo(ruta); // Se abre en modo escritura para limpiarlo
+
+	if (archivo.is_open())
+	{
+		archivo.close();
+		cout << "Archivo limpio" << endl;
+	}
+	else
+	{
+		cerr << "Error: No se pudo acceder al archivo" << endl;
+	}
 }

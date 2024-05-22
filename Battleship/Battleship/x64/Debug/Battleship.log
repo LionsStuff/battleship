@@ -1,4 +1,4 @@
 ﻿  Main.cpp
-C:\Users\leona\ODpatch\OneDrive\Documents\GitHub\battleship\Battleship\Battleship\Main.cpp(37,13): warning C4326: return type of 'main' should be 'int' instead of 'void'
-C:\Users\leona\ODpatch\OneDrive\Documents\GitHub\battleship\Battleship\Battleship\Main.cpp(493,16): warning C4267: 'initializing': conversion from 'size_t' to 'short', possible loss of data
+C:\Users\leona\ODpatch\OneDrive\Documents\GitHub\battleship\Battleship\Battleship\Main.cpp(40,13): warning C4326: return type of 'main' should be 'int' instead of 'void'
+C:\Users\leona\ODpatch\OneDrive\Documents\GitHub\battleship\Battleship\Battleship\Main.cpp(527,16): warning C4267: 'initializing': conversion from 'size_t' to 'short', possible loss of data
   Battleship.vcxproj -> C:\Users\leona\ODpatch\OneDrive\Documents\GitHub\battleship\Battleship\x64\Debug\Battleship.exe
