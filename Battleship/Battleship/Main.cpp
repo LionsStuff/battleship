@@ -3,24 +3,19 @@
 #include <locale.h>
 #include <vector>
 #include <fstream>
-#include <windows.h> //Para sleep()
+#include <windows.h>
 #include "Barco.h"
 #include "Torpedo.h"
+#include "Global.h"
 
 using namespace std;
 
-//Limites del mapa
-//SE DEBA ACTUALIZAR TAMBIEN EN BARCO.CPP para validacion de barco
-#define MAX_MAPA_XCOL 30
-#define MAX_MAPA_YROW 20
+//MODIFICAR PARA CADA USUARIO
+//RUTA A LA CARPETA DE LOS TXTs
+string rutaBase = "C:\\Users\\leona\\ODpatch\\OneDrive\\Documents\\GitHub\\battleship\\";
 
-#define nFragata 1
-#define nAcorazado 1
-#define nDestructor 1
-
-#define MAX_LINEAS_ARCHIVO 20
-
-#define strBarcoAliado "al"
+//Modificar dependiendo de que turno corresponde a cada jugador
+char turnoAliado = 'A';
 
 char** mapa;
 
@@ -46,21 +41,12 @@ enum tipo { FRAGATA, ACORAZADO, DESTRUCTOR };
 
 void main() {
 	setlocale(LC_ALL, "");
+
 	//Turno actual del juego
 	char turnoActual = 'A';
 
-	//Turno que nos corresponde
-	char turnoAliado = 'A';
-
-	//Enum de los tipos de barco y crear un vector de barcos
 	vector<Barco> barcos;
 	vector<Torpedo> torpedos;
-
-	//TORPEDO MOMENTANEO
-	/*/short coordsTorpedo[2] = {8,8};
-	Torpedo torpedo1 = Torpedo(coordsTorpedo, 0);
-	torpedos.push_back(torpedo1);*/
-	//TORPEDO MOMENTANEO
 
 	short nBarcos[nFragata + nAcorazado + nDestructor] = { nFragata, nAcorazado, nDestructor };
 
@@ -580,9 +566,6 @@ bool radarProfundo(vector<Torpedo>& torpedos, Barco barco, char** mapa) {
 
 
 // ~~~~ FUNCIONES DE ARCHIVOS ~~~~
-
-string rutaBase = "C:\\Users\\leona\\ODpatch\\OneDrive\\Documents\\GitHub\\battleship\\";
-
 
 void lecturaBarcos(vector<Barco>& barcos) {
 	string ruta = rutaBase + "Barcos.txt";

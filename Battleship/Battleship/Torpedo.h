@@ -2,6 +2,7 @@
 #include <iostream>
 #include <vector>
 #include "Barco.h"
+#include "Global.h"
 
 using namespace std;
 

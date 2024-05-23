@@ -1,7 +1,7 @@
 #include "Torpedo.h"
 
-short vectorEnX[8] = { 1, 1, 0, -1, -1, -1, 0, 1 };
-short vectorEnY[8] = { 0, -1, -1, -1, 0, 1, 1, 1 };
+extern short vectorEnX[8] = { 1, 1, 0, -1, -1, -1, 0, 1 };
+extern short vectorEnY[8] = { 0, -1, -1, -1, 0, 1, 1, 1 };
 
 Torpedo::Torpedo(short proa[2], short direccionBarco){
 	direccion = direccionBarco;

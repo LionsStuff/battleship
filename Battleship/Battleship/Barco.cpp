@@ -9,10 +9,8 @@ short csteAumentoRadar[3] = { 2,4,8 };
 short vectorMovimientoEnX[8] = { 1, 1, 0, -1, -1, -1, 0, 1 };
 short vectorMovimientoEnY[8] = { 0, -1, -1, -1, 0, 1, 1, 1 };
 
-enum class dir { E, NE, N, NO, O, SO, S, SE };
 
-#define MAX_MAPA_XCOL 30
-#define MAX_MAPA_YROW 20
+enum class dir { E, NE, N, NO, O, SO, S, SE };
 
 Barco::Barco() {
 
