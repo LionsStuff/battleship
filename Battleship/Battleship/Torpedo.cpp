@@ -12,8 +12,39 @@ Torpedo::Torpedo(short proa[2], short direccionBarco){
 	activo = true;
 }
 
+Torpedo::Torpedo(short proa[2], short torpedo[2]) {
+	direccion = -1;
+	coordsProa[0] = proa[0];
+	coordsProa[1] = proa[1];
+	coordsTorpedo[0] = torpedo[0];
+	coordsTorpedo[1] = torpedo[1];
+	getDireccion();
+	activo = true;
+}
+
 Torpedo::~Torpedo() {
 
+}
+
+void Torpedo::getDireccion()
+{
+	short xDirection;
+	short yDirection;
+	xDirection = (coordsProa[0] == coordsTorpedo[0]) ? 0 : (coordsProa[0] < coordsTorpedo[0]) ? 1 : -1;
+	yDirection = (coordsProa[1] == coordsTorpedo[1]) ? 0 : (coordsProa[1] < coordsTorpedo[1]) ? 1 : -1;
+
+	for (short i = 0; i < 8; i++)
+	{
+		if ((vectorEnX[i] == xDirection) && (vectorEnY[i] == yDirection))
+		{
+			direccion = i;
+			return;
+		}
+		else {
+			//cout << "Direccion " << i << ": " << vectorEnX[i] << "==" << xDirection << "||" << vectorEnY[i] << "==" << yDirection << endl;
+		}
+	}
+	direccion = -1;
 }
 
 bool Torpedo::moverTorpedo(vector<Barco>& barcos) {

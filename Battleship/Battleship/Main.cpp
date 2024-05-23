@@ -27,13 +27,20 @@ char** mapa;
 void limpiarMapa(char**);
 void imprimirMapa(char**);
 void actualizarMapa(char**, vector<Barco>&, string nombreRadar = "");
-Barco colocarNuevoBarco(short*, vector<Barco>&);
 void imprimirInfoBarcos(vector<Barco>&);
-void lecturaBarcos(vector<Barco>&);
+
+Barco colocarNuevoBarco(short*, vector<Barco>&);
 void colocacionAtaque(char**, vector<Barco>&);
+void colocarTorpedo(char**, vector<Torpedo>&, Barco);
 bool radarProfundo(vector<Torpedo>&, Barco, char**);
-void limpiarArchivo();
-void modificarBarcos(vector<Barco>&);
+
+void limpiarArchivo(string);
+void lecturaBarcos(vector<Barco>&);
+void lecturaTorpedos(vector<Torpedo>&);
+char lecturaTurno();
+void modificarArchivoBarcos(vector<Barco>&);
+void modificarArchivoTorpedo(vector<Torpedo>&);
+void modificarArchivoTurno(char*);
 
 enum tipo { FRAGATA, ACORAZADO, DESTRUCTOR };
 
@@ -50,26 +57,26 @@ void main() {
 	vector<Torpedo> torpedos;
 
 	//TORPEDO MOMENTANEO
-	short coordsTorpedo[2] = {8,8};
+	/*/short coordsTorpedo[2] = {8,8};
 	Torpedo torpedo1 = Torpedo(coordsTorpedo, 0);
-	torpedos.push_back(torpedo1);
+	torpedos.push_back(torpedo1);*/
 	//TORPEDO MOMENTANEO
 
 	short nBarcos[nFragata + nAcorazado + nDestructor] = { nFragata, nAcorazado, nDestructor };
+
+	system("cls");
 
 	//Inicializacion del mapa
 	mapa = new char* [MAX_MAPA_XCOL];
 	for (short i = 0; i < MAX_MAPA_XCOL; i++) {
 		mapa[i] = new char[MAX_MAPA_YROW];
 	}
+
 	limpiarMapa(mapa);
-	system("cls");
-
-
-	lecturaBarcos(barcos);
 	actualizarMapa(mapa, barcos);
-	cout << "Barcos cargados." << endl;
-	system("pause");
+	lecturaBarcos(barcos);
+
+	turnoActual = lecturaTurno();
 	
 	//FASE COLOCACION BARCOS
 	while (true) {
@@ -95,24 +102,32 @@ void main() {
 			cout << ".";
 			Sleep(750);
 			cout << ".";
+			turnoActual = lecturaTurno();
 		}
 	}
 
-	modificarBarcos(barcos);
-	turnoActual++;
+	modificarArchivoBarcos(barcos);
+	barcos.clear();
+	modificarArchivoTurno(&turnoActual);
 
 	short direccionMovimiento, inputOpcion;
 	bool inLoop = true;
 	string nombreBarco;
 
+	short movimientosRestantes = 2;
+
 	//FASE PRINCIPAL DE JUEGO
 	while (inLoop) {
-		if (turnoActual == turnoAliado) {
+		if (turnoActual == turnoAliado && movimientosRestantes > 0) {
+			lecturaBarcos(barcos);
+			lecturaTorpedos(torpedos);
+
 			system("cls");
 			actualizarMapa(mapa, barcos);
 			imprimirMapa(mapa);
 			imprimirInfoBarcos(barcos);
-			cout << "1. Mover	2. Rotar	3.Atacar	4.Radar superficial		5.Radar profundo	6.Salir" << endl;
+			cout << "Movimientos Restantes: " << movimientosRestantes << endl;
+			cout << "1. Mover	2. Rotar	3.Atacar	4.Radar superficial		5.Radar profundo	6.Terminar juego" << endl;
 			cin >> inputOpcion;
 			cin.ignore();
 			if (inputOpcion == 6) { break; }
@@ -145,7 +160,22 @@ void main() {
 						}
 						break;
 					case 3:
-						colocacionAtaque(mapa, barcos);
+						if (barcos[i].tipo == DESTRUCTOR) {
+							cout << "1.Misil	2.Torpedo" << endl;
+							cin >> inputOpcion;
+							cin.ignore();
+							switch (inputOpcion) {
+							case 1:
+								colocacionAtaque(mapa, barcos);
+								break;
+							case 2:
+								colocarTorpedo(mapa, torpedos, barcos[i]);
+								break;
+							}
+						}
+						else {
+							colocacionAtaque(mapa, barcos);
+						}
 						system("pause");
 						break;
 					case 4: //Radar superficial
@@ -189,8 +219,18 @@ void main() {
 						cout << "UN TORPEDO A EXPLOTADO UN BARCO! " << endl;
 						system("pause");
 					}
+					cout << "Torpedo ahora en: " << torpedos[i].coordsTorpedo[0] << "," << torpedos[i].coordsTorpedo[1] << endl;
+					system("pause");
 				}
 			}
+
+			modificarArchivoBarcos(barcos);
+			barcos.clear();
+			modificarArchivoTorpedo(torpedos);
+			torpedos.clear();
+			movimientosRestantes--;
+			if (movimientosRestantes <= 0) { modificarArchivoTurno(&turnoActual); }
+
 		}
 		else {
 			Sleep(750);
@@ -201,6 +241,10 @@ void main() {
 			cout << ".";
 			Sleep(750);
 			cout << ".";
+			turnoActual = lecturaTurno();
+			if (turnoActual == turnoAliado) {
+				movimientosRestantes = 2;
+			}
 		}
 	}
 
@@ -469,6 +513,17 @@ void colocacionAtaque(char** mapa, vector<Barco>&barcos)
 	cout << "Ataque fallido." << endl;
 }
 
+void colocarTorpedo(char** mapa, vector<Torpedo>& torpedos, Barco barco) {
+	if (barco.nTorpedos > 0) {
+		Torpedo torpedo = Torpedo(barco.proa, barco.direccion);
+		torpedos.push_back(torpedo);
+		cout << "Torpedo colocado!" << endl;
+	}
+	else {
+		cout << "No cuentas con torpedos." << endl;
+	}
+}
+
 bool radarProfundo(vector<Torpedo>& torpedos, Barco barco, char** mapa) {
 	bool hayTorpedo = false;
 	for (short j = 0; j < barco.vision; j++) {
@@ -497,8 +552,11 @@ bool radarProfundo(vector<Torpedo>& torpedos, Barco barco, char** mapa) {
 
 // ~~~~ FUNCIONES DE ARCHIVOS ~~~~
 
+string rutaBase = "C:\\Users\\leona\\ODpatch\\OneDrive\\Documents\\GitHub\\battleship\\";
+
+
 void lecturaBarcos(vector<Barco>& barcos) {
-	string ruta = "C:\\Users\\leona\\ODpatch\\OneDrive\\Documents\\GitHub\\battleship\\barcos.txt";
+	string ruta = rutaBase + "Barcos.txt";
 
 	//Incializacion para lecutra de archivos
 	fstream archivo(ruta, ios::in | ios::out);
@@ -593,12 +651,83 @@ void lecturaBarcos(vector<Barco>& barcos) {
 	archivo.close();
 }
 
+void lecturaTorpedos(vector<Torpedo>& torpedos) {
+	string ruta = rutaBase+"Proyectiles.txt";
 
-void modificarBarcos(vector<Barco>& barcos)
+	fstream archivo(ruta, ios::in | ios::out);
+
+	if (!archivo) {
+		cout << "Error: No se pudo acceder al archivo";
+	}
+	string lineas[MAX_LINEAS_ARCHIVO];
+	string linea;
+	int contador = -1;
+
+	while (getline(archivo, linea)) {
+		lineas[++contador] = linea;
+
+		short RtorpedoArr[2], RProaArr[2];
+		short Rdireccion;
+		string RcoordsAmbos = "";
+
+		//t(12,8)-(12, 9)
+
+		RcoordsAmbos = linea;
+
+		RcoordsAmbos.erase(remove(RcoordsAmbos.begin(), RcoordsAmbos.end(), 't'), RcoordsAmbos.end());
+		RcoordsAmbos.erase(remove(RcoordsAmbos.begin(), RcoordsAmbos.end(), '('), RcoordsAmbos.end());
+		RcoordsAmbos.erase(remove(RcoordsAmbos.begin(), RcoordsAmbos.end(), ')'), RcoordsAmbos.end());
+
+		string RProa = RcoordsAmbos.substr(0, RcoordsAmbos.find('-'));
+		string RTorpedo = RcoordsAmbos.substr(RcoordsAmbos.find('-') + 1);
+
+		RtorpedoArr[0] = stoi(RTorpedo.substr(0, RTorpedo.find(',')));
+		RtorpedoArr[1] = stoi(RTorpedo.substr(RTorpedo.find(',') + 1));
+		RProaArr[0] = stoi(RProa.substr(0, RProa.find(',')));
+		RProaArr[1] = stoi(RProa.substr(RProa.find(',') + 1));
+
+		Torpedo torpedoText = Torpedo(RProaArr, RtorpedoArr);
+
+		torpedos.push_back(torpedoText);
+	}
+
+	archivo.close();
+}
+
+char lecturaTurno() {
+	string ruta = rutaBase + "Turno.txt";
+
+	fstream archivo(ruta, ios::in | ios::out);
+	if (!archivo) {
+		cout << "Error: No se pudo acceder al archivo";
+	}
+	string linea;
+	getline(archivo, linea);
+	archivo.close();
+	return linea[0];
+}
+
+void limpiarArchivo(string nombreArchivo)
 {
-	limpiarArchivo("barcos.txt");
-	
-	string ruta = "C:\\Users\\leona\\ODpatch\\OneDrive\\Documents\\GitHub\\battleship\\barcos.txt";
+	string ruta = rutaBase+nombreArchivo;
+	ofstream archivo(ruta); // Se abre en modo escritura para limpiarlo
+
+	if (archivo.is_open())
+	{
+		archivo.close();
+		//cout << "Archivo limpio" << endl;
+	}
+	else
+	{
+		cerr << "Error: No se pudo acceder al archivo" << endl;
+	}
+}
+
+void modificarArchivoBarcos(vector<Barco>& barcos)
+{
+	limpiarArchivo("Barcos.txt");
+
+	string ruta = rutaBase + "Barcos.txt";
 	fstream archivo(ruta, ios::in | ios::out | ios::app);
 	string vidaString;
 
@@ -616,7 +745,7 @@ void modificarBarcos(vector<Barco>& barcos)
 			archivo << barcoChars[barcos[i].tipo] << "p" << "(" << barcos[i].popa[0] << "," << barcos[i].popa[1] << ")" << "-" << "(" << barcos[i].proa[0] << "," << barcos[i].proa[1] << ")" << "{" << vidaString << "}" << barcos[i].nombre;
 			archivo << endl;
 		}
-		cout << "Archivo editado" << endl;
+		//cout << "Archivo editado" << endl;
 	}
 	else
 	{
@@ -625,15 +754,50 @@ void modificarBarcos(vector<Barco>& barcos)
 
 }
 
-void limpiarArchivo(string nombreArchivo)
+void modificarArchivoTorpedo(vector<Torpedo>& torpedos)
 {
-	string ruta = "C:\\Users\\leona\\ODpatch\\OneDrive\\Documents\\GitHub\\battleship\\"+nombreArchivo;
-	ofstream archivo(ruta); // Se abre en modo escritura para limpiarlo
+	limpiarArchivo("Proyectiles.txt");
+
+	string ruta = rutaBase + "Proyectiles.txt";
+
+	fstream archivo(ruta, ios::in | ios::out | ios::app);
 
 	if (archivo.is_open())
 	{
-		archivo.close();
-		cout << "Archivo limpio" << endl;
+		for (short i = 0; i < torpedos.size(); i++)
+		{
+			if (torpedos[i].activo) {
+				archivo << "t" << "(" << torpedos[i].coordsProa[0] << "," << torpedos[i].coordsProa[1] << ")" << "-" << "(" << torpedos[i].coordsTorpedo[0] << "," << torpedos[i].coordsTorpedo[1] << ")";
+				archivo << endl;
+			}
+		}
+		//cout << "Archivo editado" << endl;
+	}
+	else
+	{
+		cerr << "Error: No se pudo acceder al archivo" << endl;
+	}
+}
+
+void modificarArchivoTurno(char* turno)
+{
+	limpiarArchivo("Turno.txt");
+
+	string ruta = rutaBase + "Turno.txt";
+
+	fstream archivo(ruta, ios::in | ios::out | ios::app);
+
+	if (archivo.is_open())
+	{
+		if(*turno == 'A'){
+			archivo << 'B';
+			*turno = 'B';
+		}
+		else {
+			archivo << 'A';
+			*turno = 'A';
+		}
+		cout << "Archivo editado" << endl;
 	}
 	else
 	{
