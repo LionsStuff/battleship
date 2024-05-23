@@ -38,15 +38,16 @@ void modificarArchivoTorpedo(vector<Torpedo>&);
 void modificarArchivoTurno(char*);
 
 enum tipo { FRAGATA, ACORAZADO, DESTRUCTOR };
+short nTorpedosBarcos[nDestructor];
 
 void main() {
 	setlocale(LC_ALL, "");
 
-	//Turno actual del juego
-	char turnoActual = 'A';
-
 	vector<Barco> barcos;
 	vector<Torpedo> torpedos;
+
+	//Turno actual del juego
+	char turnoActual = 'A';
 
 	short nBarcos[nFragata + nAcorazado + nDestructor] = { nFragata, nAcorazado, nDestructor };
 
@@ -71,6 +72,7 @@ void main() {
 				break;
 			}
 			system("cls");
+			cout << rutaBase << endl;
 			actualizarMapa(mapa, barcos);
 			imprimirMapa(mapa);
 			cout << "Barcos restantes por colocar: ";
@@ -381,10 +383,12 @@ Barco colocarNuevoBarco(short* nBarcos, vector<Barco>& barcos) {
 		nombre = strBarcoAliado;
 		nombre += charTipo;
 		nombre += to_string(nMaxes[intTipo] - nBarcos[intTipo] + 1);
-		nBarcos[intTipo]--;
 	}
 
+	nBarcos[intTipo]--;
+
 	Barco barco1 = Barco(intTipo);
+
 	barco1.nombre = nombre;
 	short popaX, popaY;
 
@@ -430,6 +434,11 @@ Barco colocarNuevoBarco(short* nBarcos, vector<Barco>& barcos) {
 		system("cls");
 	}while (true);
 
+	if (barco1.tipo == DESTRUCTOR) {
+		short countDestructor = (barco1.nombre[3] - '0');
+		barco1.nTorpedos = 5;
+		nTorpedosBarcos[countDestructor-1] = 5;
+	}
 	return barco1;
 }
 
@@ -530,9 +539,14 @@ void colocacionAtaque(char** mapa, vector<Barco>&barcos, Barco barcoAtacante)
 
 void colocarTorpedo(char** mapa, vector<Torpedo>& torpedos, Barco barco) {
 	if (barco.nTorpedos > 0) {
+		barco.nTorpedos--;
+		short countDestructor = (barco.nombre[3] - '0');
+		nTorpedosBarcos[countDestructor - 1] = barco.nTorpedos;
+
 		Torpedo torpedo = Torpedo(barco.proa, barco.direccion);
 		torpedos.push_back(torpedo);
 		cout << "Torpedo colocado!" << endl;
+		cout << "Torpedos restantes: " << barco.nTorpedos << endl;
 	}
 	else {
 		cout << "No cuentas con torpedos." << endl;
@@ -578,6 +592,7 @@ void lecturaBarcos(vector<Barco>& barcos) {
 	string lineas[MAX_LINEAS_ARCHIVO];
 	string linea;
 	int contador = -1;
+	short contadorAliados = 0;
 
 	//Loop para leer linea por linea
 	while (getline(archivo, linea)) {
@@ -647,14 +662,13 @@ void lecturaBarcos(vector<Barco>& barcos) {
 
 		barcoText.activo = (barcoText.vida <= 0) ? false : true;
 
-		/*cout << endl;
-		cout << barcoText.tipo << endl;
-		cout << barcoText.popa[0] << "," << barcoText.popa[1] << endl;
-		cout << barcoText.proa[0] << "," << barcoText.proa[1] << endl;
-		cout << barcoText.vida << endl;
-		cout << barcoText.nombre << endl;
-		cout << barcoText.direccion << endl;*/
-
+		if (barcoText.nombre.substr(0, 2) == strBarcoAliado && barcoText.tipo == DESTRUCTOR) {
+			short countDestructor = (barcoText.nombre[3] - '0');
+			barcoText.nTorpedos = nTorpedosBarcos[countDestructor-1];
+			cout << "Reiniciado torpedos: " << nTorpedosBarcos[countDestructor-1] << endl;
+			cout << "Inyectado torpedos: " << barcoText.nTorpedos << endl;
+			system("pause");
+		}
 
 		//Por ultimo ya agrega el barco al array
 		barcos.push_back(barcoText);
@@ -723,7 +737,7 @@ void limpiarArchivo(string nombreArchivo)
 {
 	string ruta = rutaBase+nombreArchivo;
 	ofstream archivo(ruta); // Se abre en modo escritura para limpiarlo
-
+	
 	if (archivo.is_open())
 	{
 		archivo.close();
@@ -742,9 +756,8 @@ void modificarArchivoBarcos(vector<Barco>& barcos)
 	string ruta = rutaBase + "Barcos.txt";
 	fstream archivo(ruta, ios::in | ios::out | ios::app);
 	string vidaString;
-
-	char barcoChars[] = { 'F','A','D' };
-
+	char barcoChars[3] = { 'F','A','D' };
+	
 	if (archivo.is_open())
 	{
 		for (short i = 0; i < barcos.size(); i++)

@@ -3,7 +3,6 @@
 short csteVida[3] = { 2, 3, 5 };
 short csteVision[3] = { 2, 3, 5 };
 short csteAlcance[3] = { 4,7,12 };
-short csteNTorpedos[3] = { 0,0,5 };
 short csteAumentoRadar[3] = { 2,4,8 };
 
 short vectorMovimientoEnX[8] = { 1, 1, 0, -1, -1, -1, 0, 1 };
@@ -27,7 +26,7 @@ Barco::Barco(short tipo) {
 	vida = csteVida[tipo];
     vision = csteVision[tipo];
     alcance = csteAlcance[tipo];
-    nTorpedos = csteNTorpedos[tipo];
+    nTorpedos = 0;
     aumentoRadar = csteAumentoRadar[tipo];
     activo = true;
     for (short i = 0; i < vida; i++) {
@@ -47,7 +46,7 @@ Barco::Barco(short tipo, short coordsPopa[2], short coordsProa[2]) {
     vida = csteVida[tipo];
     vision = csteVision[tipo];
     alcance = csteAlcance[tipo];
-    nTorpedos = csteNTorpedos[tipo];
+    nTorpedos = 0;
     aumentoRadar = csteAumentoRadar[tipo];
     activo = true; //Falta checar que si vida es 0, quitar activo
     completarCoords();

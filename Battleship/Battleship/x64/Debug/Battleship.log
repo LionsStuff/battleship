@@ -1,5 +1,5 @@
 ﻿  Main.cpp
-C:\Users\leona\ODpatch\OneDrive\Documents\GitHub\battleship\Battleship\Battleship\Main.cpp(42,13): warning C4326: return type of 'main' should be 'int' instead of 'void'
-C:\Users\leona\ODpatch\OneDrive\Documents\GitHub\battleship\Battleship\Battleship\Main.cpp(597,16): warning C4267: 'initializing': conversion from 'size_t' to 'short', possible loss of data
-C:\Users\leona\ODpatch\OneDrive\Documents\GitHub\battleship\Battleship\Battleship\Main.cpp(682,9): warning C4101: 'Rdireccion': unreferenced local variable
+C:\Users\leona\ODpatch\OneDrive\Documents\GitHub\battleship\Battleship\Battleship\Main.cpp(43,13): warning C4326: return type of 'main' should be 'int' instead of 'void'
+C:\Users\leona\ODpatch\OneDrive\Documents\GitHub\battleship\Battleship\Battleship\Main.cpp(612,16): warning C4267: 'initializing': conversion from 'size_t' to 'short', possible loss of data
+C:\Users\leona\ODpatch\OneDrive\Documents\GitHub\battleship\Battleship\Battleship\Main.cpp(696,9): warning C4101: 'Rdireccion': unreferenced local variable
   Battleship.vcxproj -> C:\Users\leona\ODpatch\OneDrive\Documents\GitHub\battleship\Battleship\x64\Debug\Battleship.exe
