@@ -30,7 +30,7 @@ void actualizarMapa(char**, vector<Barco>&, string nombreRadar = "");
 void imprimirInfoBarcos(vector<Barco>&);
 
 Barco colocarNuevoBarco(short*, vector<Barco>&);
-void colocacionAtaque(char**, vector<Barco>&);
+void colocacionAtaque(char**, vector<Barco>&, Barco);
 void colocarTorpedo(char**, vector<Torpedo>&, Barco);
 bool radarProfundo(vector<Torpedo>&, Barco, char**);
 
@@ -166,7 +166,7 @@ void main() {
 							cin.ignore();
 							switch (inputOpcion) {
 							case 1:
-								colocacionAtaque(mapa, barcos);
+								colocacionAtaque(mapa, barcos, barcos[i]);
 								break;
 							case 2:
 								colocarTorpedo(mapa, torpedos, barcos[i]);
@@ -174,7 +174,7 @@ void main() {
 							}
 						}
 						else {
-							colocacionAtaque(mapa, barcos);
+							colocacionAtaque(mapa, barcos, barcos[i]);
 						}
 						system("pause");
 						break;
@@ -219,8 +219,9 @@ void main() {
 						cout << "UN TORPEDO A EXPLOTADO UN BARCO! " << endl;
 						system("pause");
 					}
-					cout << "Torpedo ahora en: " << torpedos[i].coordsTorpedo[0] << "," << torpedos[i].coordsTorpedo[1] << endl;
-					system("pause");
+					if (torpedos[i].coordsTorpedo[0] > MAX_MAPA_XCOL || torpedos[i].coordsTorpedo[1] > MAX_MAPA_YROW || torpedos[i].coordsTorpedo[0] < 1 || torpedos[i].coordsTorpedo[1] < 1) {
+						torpedos[i].activo = false;
+					}
 				}
 			}
 
@@ -309,7 +310,7 @@ void actualizarMapa(char** mapa, vector<Barco>& barcos, string nombreRadar) {
 		else {
 			vision = barcos[i].vision;
 		}
-		if (/*barcos[i].nombre.substr(0, 2) == strBarcoAliado*/true) {
+		if (barcos[i].nombre.substr(0, 2) == strBarcoAliado) {
 			for (short j = 0; j < barcos[i].vision; j++) {
 				for (short y = (barcos[i].coordsBarco[j][1] - vision); y <= (barcos[i].coordsBarco[j][1] + vision); y++) {
 					if (y > 0 && y <= MAX_MAPA_YROW) {
@@ -343,7 +344,9 @@ void actualizarMapa(char** mapa, vector<Barco>& barcos, string nombreRadar) {
 
 		for (short j = 0; j < barcos[i].vision; j++) {
 			//cout << barcos[i].coordsBarco[j][0] << "," << barcos[i].coordsBarco[j][1] - 1 << endl;
-			mapa[(barcos[i].coordsBarco[j][0] - 1)][(barcos[i].coordsBarco[j][1] - 1)] = chars[j];
+			if (mapa[(barcos[i].coordsBarco[j][0] - 1)][(barcos[i].coordsBarco[j][1] - 1)] == ':') {
+				mapa[(barcos[i].coordsBarco[j][0] - 1)][(barcos[i].coordsBarco[j][1] - 1)] = chars[j];
+			}
 		}
 	}
 }
@@ -444,14 +447,30 @@ Barco colocarNuevoBarco(short* nBarcos, vector<Barco>& barcos) {
 	return barco1;
 }
 
-void colocacionAtaque(char** mapa, vector<Barco>&barcos)
+void colocacionAtaque(char** mapa, vector<Barco>&barcos, Barco barcoAtacante)
 {
 	short ataquex, ataquey;
 	char foo = 'y';
+	bool coordsAtaqueValidas = false;
 	do
 	{
 		do
 		{
+			system("cls");
+			for (short j = 0; j < barcoAtacante.vision; j++) {
+				for (short y = (barcoAtacante.coordsBarco[j][1] - barcoAtacante.alcance); y <= (barcoAtacante.coordsBarco[j][1] + barcoAtacante.alcance); y++) {
+					if (y > 0 && y <= MAX_MAPA_YROW) {
+						for (short x = (barcoAtacante.coordsBarco[j][0] - barcoAtacante.alcance); x <= (barcoAtacante.coordsBarco[j][0] + barcoAtacante.alcance); x++) {
+							if (x > 0 && x <= MAX_MAPA_XCOL) {
+								if (mapa[x - 1][y - 1] == ':' || mapa[x - 1][y - 1] == '=') {
+									mapa[x - 1][y - 1] = '*';
+								}
+							}
+						}
+					}
+				}
+			}
+			imprimirMapa(mapa);
 			//Ingeso de coordenadas
 			cout << "Ingrese las cooordenadas que ataca. " << endl << "X: ";
 			cin >> ataquex;
@@ -476,14 +495,24 @@ void colocacionAtaque(char** mapa, vector<Barco>&barcos)
 		cin >> foo;
 		if (foo != 'n')
 		{
-			break;
+			for (short i = 0; i < barcoAtacante.vision; i++) {
+				if (abs(ataquex - barcoAtacante.coordsBarco[i][0]) <= barcoAtacante.alcance && abs(ataquey - barcoAtacante.coordsBarco[i][1]) <= barcoAtacante.alcance) {
+					coordsAtaqueValidas = true;
+					break;
+				}
+			}
+
+			if(!coordsAtaqueValidas){ 
+				cout << "Ataque fuera de rango." << endl;
+				mapa[(ataquex - 1)][(ataquey - 1)] = '=';
+			}
 		}
 		else
 		{
 			mapa[(ataquex - 1)][(ataquey - 1)] = '=';
 		}
 
-	} while (true);
+	} while (!coordsAtaqueValidas);
 
 	//Por predeterminado pone el simbolo correspondiente a fallido
 	system("cls");
