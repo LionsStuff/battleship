@@ -149,7 +149,7 @@ void main() {
 						break;
 					case 3:
 						if (barcos[i].tipo == DESTRUCTOR) {
-							cout << "1.Misil	2.Torpedo" << endl;
+							cout << "1.Misil	 2.Torpedo" << endl;
 							cin >> inputOpcion;
 							cin.ignore();
 							switch (inputOpcion) {

@@ -31,6 +31,5 @@ public:
 	bool barcoEnPosicionValida(char**, vector<Barco>&, short modif = 0, short modifDireccion = 0);
 	void completarCoords();
 	void getDireccion();
-	//Probando cosas de Mario
 	bool ataque(short, short);
 };
