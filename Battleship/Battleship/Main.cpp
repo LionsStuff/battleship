@@ -72,7 +72,6 @@ void main() {
 				break;
 			}
 			system("cls");
-			cout << rutaBase << endl;
 			actualizarMapa(mapa, barcos);
 			imprimirMapa(mapa);
 			cout << "Barcos restantes por colocar: ";
@@ -99,6 +98,7 @@ void main() {
 	modificarArchivoTurno(&turnoActual);
 
 	short direccionMovimiento, inputOpcion;
+	short nBarcosAl = 0, nBarcosEn = 0;
 	bool inLoop = true;
 	string nombreBarco;
 
@@ -213,6 +213,29 @@ void main() {
 				}
 			}
 
+			nBarcosAl = 0;
+			nBarcosEn = 0;
+			for (short i = 0; i < barcos.size(); i++) {
+				if (barcos[i].nombre.substr(0, 2) == strBarcoAliado) {
+					if (barcos[i].activo || barcos[i].vida <= 0) {
+						nBarcosAl++;
+					}
+				}
+				else {
+					if (barcos[i].activo || barcos[i].vida <= 0) {
+						nBarcosEn++;
+					}
+				}
+			}
+
+			if (nBarcosAl <= 0) {
+				inLoop = false;
+				break;
+			}else if(nBarcosEn <= 0) {
+				inLoop = false;
+				break;
+			}
+
 			modificarArchivoBarcos(barcos);
 			barcos.clear();
 			modificarArchivoTorpedo(torpedos);
@@ -237,8 +260,48 @@ void main() {
 		}
 	}
 
-};
+	if (nBarcosAl > 0 && nBarcosEn <= 0) {
+		system("cls");
+		imprimirMapa(mapa);
+		Sleep(1000);
+		cout << "¡¡FELICIDADES!!" << endl;
+		Sleep(1000);
+		cout << "Haz ganado." << endl;
+		Sleep(1000);
+		imprimirInfoBarcos(barcos);
+	}
+	else if (nBarcosEn > 0 && nBarcosAl <= 0) {
+			system("cls");
+			imprimirMapa(mapa);
+			Sleep(1000);
+			cout << "Raios..." << endl;
+			Sleep(1000);
+			cout << "Haz perdido." << endl;
+	}
+	else if (nBarcosEn == 0 && nBarcosAl == 0) {
+		system("cls");
+		imprimirMapa(mapa);
+		Sleep(500);
+		cout << "¿Heh? ¡¿Empate?!" << endl;
+		Sleep(1500);
+		cout << "Han, ¿empatado?" << endl;
+		Sleep(2500);
+		cout << "No no no, esto no puede ser posible, no puede haber un empate." << endl;
+		Sleep(3250);
+		cout << "Almenos que..." << endl;
+		Sleep(1750);
+		cout << "Tonterias" << endl;
+		Sleep(1750);
+		cout << "No, hicieron trampa. Deben jugar de nuevo." << endl;
+		Sleep(2750);
+		cout << "Regresen cuando decidan no hacer trampa" << endl;
+		Sleep(3000);
+		cout << "Tramposos" << endl;
+		Sleep(3000);
+	}
 
+
+};
 
 
 
@@ -392,7 +455,6 @@ Barco colocarNuevoBarco(short* nBarcos, vector<Barco>& barcos) {
 	barco1.nombre = nombre;
 	short popaX, popaY;
 
-	//Colocacion de barco - Por pasarlo a una funcion
 	system("cls");
 	do {
 		imprimirMapa(mapa);
@@ -524,10 +586,10 @@ void colocacionAtaque(char** mapa, vector<Barco>&barcos, Barco barcoAtacante)
 			if (barcos[i].activo) {
 				mapa[(ataquex - 1)][(ataquey - 1)] = 'X';
 				imprimirMapa(mapa);
-				cout << "¡Dio en el blanco (negro) !" << endl;
+				cout << "¡Diste en el blanco!" << endl;
 				if (barcos[i].vida <= 0) {
 					barcos[i].activo = false;
-					cout << "BARCO HUNDIDO!" << endl;
+					cout << "¡BARCO HUNDIDO!" << endl;
 				}
 			}
 			return;
@@ -649,7 +711,6 @@ void lecturaBarcos(vector<Barco>& barcos) {
 
 		barcoText.nombre = RNombre;
 
-		//Momentaneo, falta traducir a coords y no solo suma
 		for (short v = 0; v < Rvidas.size(); v++) {
 			if (Rvidas[v] != '1') {
 				barcoText.vida--;
@@ -665,9 +726,6 @@ void lecturaBarcos(vector<Barco>& barcos) {
 		if (barcoText.nombre.substr(0, 2) == strBarcoAliado && barcoText.tipo == DESTRUCTOR) {
 			short countDestructor = (barcoText.nombre[3] - '0');
 			barcoText.nTorpedos = nTorpedosBarcos[countDestructor-1];
-			cout << "Reiniciado torpedos: " << nTorpedosBarcos[countDestructor-1] << endl;
-			cout << "Inyectado torpedos: " << barcoText.nTorpedos << endl;
-			system("pause");
 		}
 
 		//Por ultimo ya agrega el barco al array
@@ -695,8 +753,6 @@ void lecturaTorpedos(vector<Torpedo>& torpedos) {
 		short RtorpedoArr[2], RProaArr[2];
 		short Rdireccion;
 		string RcoordsAmbos = "";
-
-		//t(12,8)-(12, 9)
 
 		RcoordsAmbos = linea;
 
@@ -822,7 +878,7 @@ void modificarArchivoTurno(char* turno)
 			archivo << 'A';
 			*turno = 'A';
 		}
-		cout << "Archivo editado" << endl;
+		//cout << "Archivo editado" << endl;
 	}
 	else
 	{
